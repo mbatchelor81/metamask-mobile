@@ -15,17 +15,18 @@ import {
   getVersion,
   getBuildNumber,
 } from 'react-native-device-info';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { fontStyles } from '../../../../styles/common';
-import PropTypes from 'prop-types';
 import { strings } from '../../../../../locales/i18n';
 import { getNavigationOptionsTitle } from '../../../UI/Navbar';
 import AppConstants from '../../../../core/AppConstants';
 import { ThemeContext, mockTheme } from '../../../../util/theme';
+import { Theme } from '../../../../util/theme/models';
 import { AboutMetaMaskSelectorsIDs } from '../../../../../e2e/selectors/Settings/AboutMetaMask.selectors';
 
 const IS_QA = process.env['METAMASK_ENVIRONMENT'] === 'qa';
 
-const createStyles = (colors) =>
+const createStyles = (colors: any) =>
   StyleSheet.create({
     wrapper: {
       backgroundColor: colors.background.default,
@@ -87,25 +88,33 @@ const createStyles = (colors) =>
 
 const foxImage = require('../../../../images/branding/fox.png'); // eslint-disable-line import/no-commonjs
 
+interface AppInformationProps {
+  navigation: NavigationProp<ParamListBase>;
+}
+
+interface AppInformationState {
+  appInfo: string;
+  appVersion: string;
+}
+
 /**
  * View that contains app information
  */
-export default class AppInformation extends PureComponent {
-  static propTypes = {
-    /**
-    /* navigation object required to push new views
-    */
-    navigation: PropTypes.object,
-  };
+export default class AppInformation extends PureComponent<
+  AppInformationProps,
+  AppInformationState
+> {
+  static contextType = ThemeContext;
+  declare context: Theme;
 
-  state = {
+  state: AppInformationState = {
     appInfo: '',
     appVersion: '',
   };
 
-  updateNavBar = () => {
+  updateNavBar = (): void => {
     const { navigation } = this.props;
-    const colors = this.context.colors || mockTheme.colors;
+    const colors = this.context?.colors || mockTheme.colors;
     navigation.setOptions(
       getNavigationOptionsTitle(
         strings('app_settings.info_title'),
@@ -116,7 +125,7 @@ export default class AppInformation extends PureComponent {
     );
   };
 
-  componentDidMount = async () => {
+  componentDidMount = async (): Promise<void> => {
     this.updateNavBar();
     const appName = await getApplicationName();
     const appVersion = await getVersion();
@@ -127,11 +136,11 @@ export default class AppInformation extends PureComponent {
     });
   };
 
-  componentDidUpdate = () => {
+  componentDidUpdate = (): void => {
     this.updateNavBar();
   };
 
-  goTo = (url, title) => {
+  goTo = (url: string, title: string): void => {
     InteractionManager.runAfterInteractions(() => {
       this.props.navigation.navigate('Webview', {
         screen: 'SimpleWebview',
@@ -143,38 +152,38 @@ export default class AppInformation extends PureComponent {
     });
   };
 
-  onPrivacyPolicy = () => {
+  onPrivacyPolicy = (): void => {
     const url = AppConstants.URLS.PRIVACY_POLICY;
     this.goTo(url, strings('app_information.privacy_policy'));
   };
 
-  onTermsOfUse = () => {
+  onTermsOfUse = (): void => {
     const url = AppConstants.URLS.TERMS_AND_CONDITIONS;
     this.goTo(url, strings('app_information.terms_of_use'));
   };
 
-  onAttributions = () => {
+  onAttributions = (): void => {
     const url = `https://raw.githubusercontent.com/MetaMask/metamask-mobile/v${this.state.appVersion}/attribution.txt`;
     this.goTo(url, strings('app_information.attributions'));
   };
 
-  onSupportCenter = () => {
+  onSupportCenter = (): void => {
     const url = 'https://support.metamask.io';
     this.goTo(url, strings('drawer.metamask_support'));
   };
 
-  onWebSite = () => {
+  onWebSite = (): void => {
     const url = 'https://metamask.io/';
     this.goTo(url, 'metamask.io');
   };
 
-  onContactUs = () => {
+  onContactUs = (): void => {
     const url = 'https://support.metamask.io';
     this.goTo(url, strings('drawer.metamask_support'));
   };
 
-  render = () => {
-    const colors = this.context.colors || mockTheme.colors;
+  render = (): JSX.Element => {
+    const colors = this.context?.colors || mockTheme.colors;
     const styles = createStyles(colors);
 
     return (
@@ -197,7 +206,7 @@ export default class AppInformation extends PureComponent {
             ) : null}
           </View>
           <Text style={styles.title}>{strings('app_information.links')}</Text>
-          <View style={styles.links}>
+          <View>
             <TouchableOpacity onPress={this.onPrivacyPolicy}>
               <Text style={styles.link}>
                 {strings('app_information.privacy_policy')}
@@ -215,7 +224,7 @@ export default class AppInformation extends PureComponent {
             </TouchableOpacity>
           </View>
           <View style={styles.division} />
-          <View style={styles.links}>
+          <View>
             <TouchableOpacity onPress={this.onSupportCenter}>
               <Text style={styles.link}>
                 {strings('app_information.support_center')}
@@ -237,5 +246,3 @@ export default class AppInformation extends PureComponent {
     );
   };
 }
-
-AppInformation.contextType = ThemeContext;
