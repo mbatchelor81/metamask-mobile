@@ -6,7 +6,7 @@ describe('GasEducationCarousel', () => {
   it('should render correctly', () => {
     const { toJSON } = renderWithProvider(
       <GasEducationCarousel
-        navigation={{ getParam: () => false, setOptions: () => null }}
+        navigation={{ setOptions: () => null, goBack: () => null } as any}
       />,
     );
     expect(toJSON()).toMatchSnapshot();
