@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import { Hex } from '@metamask/utils';
 import Engine from '../../../core/Engine';
 import {
   StyleSheet,
@@ -46,7 +47,7 @@ interface IQRSigningDetails {
   showHint?: boolean;
   shouldStartAnimated?: boolean;
   bypassAndroidCameraAccessCheck?: boolean;
-  fromAddress: string;
+  fromAddress: Hex;
 }
 
 // TODO: Replace "any" with type
