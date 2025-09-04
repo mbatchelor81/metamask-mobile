@@ -5,7 +5,7 @@ import { useBridgeQuoteData } from '../../hooks/useBridgeQuoteData';
 import Engine from '../../../../../core/Engine';
 import { RequestStatus } from '@metamask/bridge-controller';
 import { act, waitFor } from '@testing-library/react-native';
-import { setupIntegrationTests } from './setup';
+import { setupIntegrationTests } from './testSetup';
 import mockQuotes from '../../_mocks_/mock-quotes-sol-sol.json';
 
 jest.mock('@metamask/bridge-controller', () => ({

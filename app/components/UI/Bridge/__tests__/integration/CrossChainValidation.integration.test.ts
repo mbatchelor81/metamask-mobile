@@ -7,7 +7,7 @@ import {
   selectIsSolanaSwap,
 } from '../../../../../core/redux/slices/bridge';
 import { useSelector } from 'react-redux';
-import { setupIntegrationTests } from './setup';
+import { setupIntegrationTests } from './testSetup';
 import { isSolanaChainId } from '@metamask/bridge-controller';
 
 jest.mock('@metamask/bridge-controller', () => ({

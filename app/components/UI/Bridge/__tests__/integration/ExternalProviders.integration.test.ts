@@ -4,7 +4,7 @@ import Engine from '../../../../../core/Engine';
 import { renderHookWithProvider } from '../../../../../util/test/renderWithProvider';
 import { useBridgeQuoteData } from '../../hooks/useBridgeQuoteData';
 import { useBridgeQuoteRequest } from '../../hooks/useBridgeQuoteRequest';
-import { setupIntegrationTests } from './setup';
+import { setupIntegrationTests } from './testSetup';
 import mockQuotes from '../../_mocks_/mock-quotes-sol-sol.json';
 
 jest.mock('@metamask/bridge-controller', () => ({
