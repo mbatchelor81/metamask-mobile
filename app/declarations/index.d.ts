@@ -296,6 +296,25 @@ declare module '@metamask/react-native-actionsheet' {
 
 declare module '@metamask/react-native-search-api';
 
+declare module '@metamask/react-native-button' {
+  import { ComponentType } from 'react';
+  const Button: ComponentType<any>;
+  export default Button;
+}
+
+declare module 'zxcvbn' {
+  interface ZXCVBNResult {
+    score: number;
+    feedback: {
+      warning: string;
+      suggestions: string[];
+    };
+  }
+  
+  function zxcvbn(password: string): ZXCVBNResult;
+  export default zxcvbn;
+}
+
 /**
  * @sentry/react-native types for v^6.10.0
  * Types are overridden to ensure captureException receives an Error type for more reliable stack traces

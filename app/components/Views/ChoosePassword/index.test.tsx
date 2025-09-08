@@ -26,7 +26,10 @@ describe('ChoosePassword', () => {
   it('should render correctly', () => {
     const wrapper = shallow(
       <Provider store={store}>
-        <ChoosePassword route={{ params: [ONBOARDING, PROTECT] }} />
+        <ChoosePassword 
+          navigation={{} as any}
+          route={{ key: 'test', name: 'ChoosePassword', params: [ONBOARDING, PROTECT] }} 
+        />
       </Provider>,
     );
     expect(wrapper).toMatchSnapshot();
