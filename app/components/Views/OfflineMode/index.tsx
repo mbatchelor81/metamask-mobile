@@ -1,10 +1,11 @@
 'use strict';
 import React from 'react';
 import { SafeAreaView, Image, View, StyleSheet } from 'react-native';
+import type { NavigationProp } from '@react-navigation/native';
+import type { NetInfoState } from '@react-native-community/netinfo';
 import Text from '../../Base/Text';
 import NetInfo from '@react-native-community/netinfo';
 import { baseStyles, fontStyles } from '../../../styles/common';
-import PropTypes from 'prop-types';
 import { strings } from '../../../../locales/i18n';
 import StyledButton from '../../UI/StyledButton';
 import { getOfflineModalNavbar } from '../../UI/Navbar';
@@ -14,8 +15,14 @@ import AppConstants from '../../../core/AppConstants';
 import { connect } from 'react-redux';
 import { getInfuraBlockedSelector } from '../../../reducers/infuraAvailability';
 import { useTheme } from '../../../util/theme';
+import type { Theme } from '../../../util/theme/models';
 
-const createStyles = (colors) =>
+interface OfflineModeProps {
+  navigation: NavigationProp<any>;
+  infuraBlocked?: boolean;
+}
+
+const createStyles = (colors: Theme['colors']) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -51,26 +58,26 @@ const createStyles = (colors) =>
 
 const astronautImage = require('../../../images/astronaut.png'); // eslint-disable-line import/no-commonjs
 
-const OfflineMode = ({ navigation, infuraBlocked }) => {
+const OfflineMode = ({ navigation, infuraBlocked }: OfflineModeProps): JSX.Element => {
   const { colors } = useTheme();
   const styles = createStyles(colors);
 
-  const netinfo = NetInfo.useNetInfo();
+  const netinfo: NetInfoState = NetInfo.useNetInfo();
 
-  const tryAgain = () => {
+  const tryAgain = (): void => {
     if (netinfo?.isConnected) {
-      navigation.pop();
+      navigation.goBack();
     }
   };
 
-  const learnMore = () => {
+  const learnMore = (): void => {
     navigation.navigate('Webview', {
       screen: 'SimpleWebview',
       params: { url: AppConstants.URLS.CONNECTIVITY_ISSUES },
     });
   };
 
-  const action = () => {
+  const action = (): void => {
     if (infuraBlocked) {
       learnMore();
     } else {
@@ -103,21 +110,16 @@ const OfflineMode = ({ navigation, infuraBlocked }) => {
   );
 };
 
-OfflineMode.navigationOptions = ({ navigation }) =>
-  getOfflineModalNavbar(navigation);
+OfflineMode.navigationOptions = () =>
+  getOfflineModalNavbar();
 
-OfflineMode.propTypes = {
-  /**
-   * Object that represents the navigator
-   */
-  navigation: PropTypes.object,
-  /**
-   * Whether infura was blocked or not
-   */
-  infuraBlocked: PropTypes.bool,
-};
+interface RootState {
+  infuraAvailability?: {
+    isBlocked: boolean;
+  };
+}
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: RootState) => ({
   infuraBlocked: getInfuraBlockedSelector(state),
 });
 

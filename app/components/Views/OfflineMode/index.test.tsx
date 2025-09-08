@@ -4,7 +4,12 @@ import OfflineMode from './';
 
 describe('OfflineMode', () => {
   it('should render correctly', () => {
-    const { toJSON } = renderWithProvider(<OfflineMode />);
+    const mockNavigation = {
+      navigate: jest.fn(),
+      pop: jest.fn(),
+    } as any;
+    
+    const { toJSON } = renderWithProvider(<OfflineMode navigation={mockNavigation} />);
     expect(toJSON()).toMatchSnapshot();
   });
 });
