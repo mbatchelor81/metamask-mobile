@@ -6,7 +6,7 @@ describe('GasEducationCarousel', () => {
   it('should render correctly', () => {
     const { toJSON } = renderWithProvider(
       <GasEducationCarousel
-        navigation={{ getParam: () => false, setOptions: () => null }}
+        navigation={{ setOptions: () => null } as any} // eslint-disable-line @typescript-eslint/no-explicit-any
       />,
     );
     expect(toJSON()).toMatchSnapshot();
