@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
-import PropTypes from 'prop-types';
 import { connect, useSelector } from 'react-redux';
 import { withNavigation } from '@react-navigation/compat';
+import type { NavigationProp } from '@react-navigation/native';
+import type { InternalAccount } from '@metamask/keyring-internal-api';
 import { showAlert } from '../../../actions/alert';
 import Transactions from '../../UI/Transactions';
 import {
@@ -43,6 +44,18 @@ const styles = StyleSheet.create({
   },
 });
 
+interface TransactionsViewProps {
+  navigation?: NavigationProp<any>;
+  conversionRate?: number;
+  selectedInternalAccount?: InternalAccount;
+  networkType?: string;
+  currentCurrency?: string;
+  transactions?: any[]; // TODO: Define proper Transaction type from transaction controller
+  chainId?: string;
+  tokens?: any[]; // TODO: Define proper Token type from tokens controller
+  tokenNetworkFilter?: any; // TODO: Define proper TokenNetworkFilter type from preferences controller
+}
+
 const TransactionsView = ({
   navigation,
   conversionRate,
@@ -53,29 +66,29 @@ const TransactionsView = ({
   chainId,
   tokens,
   tokenNetworkFilter,
-}) => {
-  const [allTransactions, setAllTransactions] = useState([]);
-  const [submittedTxs, setSubmittedTxs] = useState([]);
-  const [confirmedTxs, setConfirmedTxs] = useState([]);
-  const [loading, setLoading] = useState();
-  const selectedNetworkClientId = useSelector(selectSelectedNetworkClientId);
+}: TransactionsViewProps) => {
+  const [allTransactions, setAllTransactions] = useState<any[]>([]);
+  const [submittedTxs, setSubmittedTxs] = useState<any[]>([]);
+  const [confirmedTxs, setConfirmedTxs] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>();
+  const selectedNetworkClientId: string = useSelector(selectSelectedNetworkClientId);
 
-  const selectedAddress = toChecksumHexAddress(
-    selectedInternalAccount?.address,
+  const selectedAddress: string = toChecksumHexAddress(
+    selectedInternalAccount?.address || '',
   );
 
-  const isPopularNetwork = useSelector(selectIsPopularNetwork);
+  const isPopularNetwork: boolean = useSelector(selectIsPopularNetwork);
 
   const filterTransactions = useCallback(
-    (networkId) => {
-      let accountAddedTimeInsertPointFound = false;
-      const addedAccountTime = selectedInternalAccount?.metadata.importTime;
+    (networkId: string) => {
+      let accountAddedTimeInsertPointFound: boolean = false;
+      const addedAccountTime: number | undefined = selectedInternalAccount?.metadata.importTime;
 
-      const submittedTxs = [];
-      const confirmedTxs = [];
-      const submittedNonces = [];
+      const submittedTxs: any[] = [];
+      const confirmedTxs: any[] = [];
+      const submittedNonces: (string | number)[] = [];
 
-      const allTransactionsSorted = sortTransactions(transactions).filter(
+      const allTransactionsSorted = sortTransactions(transactions || []).filter(
         (tx, index, self) =>
           self.findIndex((_tx) => _tx.id === tx.id) === index,
       );
@@ -83,10 +96,10 @@ const TransactionsView = ({
       const allTransactions = allTransactionsSorted.filter((tx) => {
         const filter = filterByAddressAndNetwork(
           tx,
-          tokens,
+          tokens || [],
           selectedAddress,
           networkId,
-          chainId,
+          chainId || '',
           tokenNetworkFilter,
         );
 
@@ -94,8 +107,8 @@ const TransactionsView = ({
 
         tx.insertImportTime = addAccountTimeFlagFilter(
           tx,
-          addedAccountTime,
-          accountAddedTimeInsertPointFound,
+          addedAccountTime as any,
+          accountAddedTimeInsertPointFound as any,
         );
         if (tx.insertImportTime) accountAddedTimeInsertPointFound = true;
 
@@ -195,47 +208,9 @@ const TransactionsView = ({
   );
 };
 
-TransactionsView.propTypes = {
-  /**
-   * ETH to current currency conversion rate
-   */
-  conversionRate: PropTypes.number,
-  /**
-   * Currency code of the currently-active currency
-   */
-  currentCurrency: PropTypes.string,
-  /**
-   * InternalAccount object required to get account name, address and import time
-   */
-  selectedInternalAccount: PropTypes.object,
-  /**
-   * navigation object required to push new views
-   */
-  navigation: PropTypes.object,
-  /**
-   * An array that represents the user transactions
-   */
-  transactions: PropTypes.array,
-  /**
-   * A string represeting the network name
-   */
-  networkType: PropTypes.string,
-  /**
-   * Array of ERC20 assets
-   */
-  tokens: PropTypes.array,
-  /**
-   * Current chainId
-   */
-  chainId: PropTypes.string,
-  /**
-   * Array of network tokens filter
-   */
-  tokenNetworkFilter: PropTypes.object,
-};
 
-const mapStateToProps = (state) => {
-  const chainId = selectChainId(state);
+const mapStateToProps = (state: any) => {
+  const chainId: string = selectChainId(state);
 
   return {
     conversionRate: selectConversionRate(state),
@@ -249,11 +224,12 @@ const mapStateToProps = (state) => {
   };
 };
 
-const mapDispatchToProps = (dispatch) => ({
-  showAlert: (config) => dispatch(showAlert(config)),
+const mapDispatchToProps = (dispatch: any) => ({
+  showAlert: (config: any) => dispatch(showAlert(config)),
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
+  // @ts-expect-error - withNavigation HOC has type incompatibility with modern navigation types
 )(withNavigation(TransactionsView));
