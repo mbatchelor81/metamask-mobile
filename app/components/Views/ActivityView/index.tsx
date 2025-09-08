@@ -40,7 +40,7 @@ import {
   TextVariant,
 } from '../../../component-library/components/Texts/Text';
 
-const createStyles = (params) => {
+const createStyles = (params: { theme: any }) => {
   const { theme } = params;
   const { colors } = theme;
   return StyleSheet.create({
@@ -82,7 +82,6 @@ const createStyles = (params) => {
     },
     title: {
       marginTop: 20,
-      fontSize: 20,
       color: colors.text.default,
       ...typography.sHeadingMD,
       fontFamily: getFontFamily(TextVariant.HeadingMD),
@@ -93,7 +92,7 @@ const createStyles = (params) => {
   });
 };
 
-const ActivityView = () => {
+const ActivityView: React.FC = () => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -103,20 +102,20 @@ const ActivityView = () => {
 
   const { trackEvent, createEventBuilder } = useMetrics();
   const navigation = useNavigation();
-  const selectedAddress = useSelector(
+  const selectedAddress: string | undefined = useSelector(
     selectSelectedInternalAccountFormattedAddress,
   );
-  const currentChainId = useSelector(selectEvmChainId);
-  const isAllNetworks = useSelector(selectIsAllNetworks);
-  const isPopularNetwork = useSelector(selectIsPopularNetwork);
-  const isEvmSelected = useSelector(selectIsEvmNetworkSelected);
-  const networkName = useSelector(selectNetworkName);
-  const hasOrders = useSelector((state) => getHasOrders(state) || false);
-  const accountsByChainId = useSelector(selectAccountsByChainId);
-  const tabViewRef = useRef();
-  const params = useParams();
+  const currentChainId: string = useSelector(selectEvmChainId);
+  const isAllNetworks: boolean = useSelector(selectIsAllNetworks);
+  const isPopularNetwork: boolean = useSelector(selectIsPopularNetwork);
+  const isEvmSelected: boolean = useSelector(selectIsEvmNetworkSelected);
+  const networkName: string | null = useSelector(selectNetworkName);
+  const hasOrders: boolean = useSelector((state: any) => getHasOrders(state) || false);
+  const accountsByChainId: any = useSelector(selectAccountsByChainId);
+  const tabViewRef = useRef<any>();
+  const params: any = useParams();
 
-  const isTestnetOrNotPopularNetwork =
+  const isTestnetOrNotPopularNetwork: boolean =
     isTestNet(currentChainId) || !isPopularNetwork;
 
   const openAccountSelector = useCallback(() => {
@@ -128,7 +127,7 @@ const ActivityView = () => {
       createEventBuilder(MetaMetricsEvents.BROWSER_OPEN_ACCOUNT_SWITCH)
         .addProperties({
           number_of_accounts: Object.keys(
-            accountsByChainId[selectedAddress] ?? {},
+            accountsByChainId[selectedAddress ?? ''] ?? {},
           ).length,
         })
         .build(),
@@ -178,6 +177,7 @@ const ActivityView = () => {
     <ErrorBoundary navigation={navigation} view="ActivityView">
       <View style={[styles.header, { marginTop: insets.top }]}>
         <Text
+          // @ts-expect-error - Style compatibility issue with typography spread
           style={styles.title}
           variant={DEFAULT_HEADERBASE_TITLE_TEXTVARIANT}
         >
@@ -213,13 +213,16 @@ const ActivityView = () => {
         >
           {selectedAddress && isNonEvmAddress(selectedAddress) ? (
             <MultichainTransactionsView
+              // @ts-expect-error - tabLabel is injected by ScrollableTabView
               tabLabel={strings('transactions_view.title')}
             />
           ) : (
+            // @ts-expect-error - ConnectedComponent type incompatible with JSX, tabLabel injected by ScrollableTabView
             <TransactionsView tabLabel={strings('transactions_view.title')} />
           )}
           {hasOrders && (
             <RampOrdersList
+              // @ts-expect-error - tabLabel is injected by ScrollableTabView
               tabLabel={strings('fiat_on_ramp_aggregator.orders')}
             />
           )}
