@@ -13,7 +13,8 @@ import {
   Image,
   TextInput,
 } from 'react-native';
-import PropTypes from 'prop-types';
+import type { NavigationProp } from '@react-navigation/native';
+import type { IWithMetricsAwarenessProps } from '../../hooks/useMetrics/withMetricsAwareness.types';
 import { lastEventId as getLatestSentryId } from '@sentry/react-native';
 import { captureSentryFeedback } from '../../../util/sentry/utils';
 import { RevealPrivateCredential } from '../RevealPrivateCredential';
@@ -44,7 +45,28 @@ import { isTest } from '../../../util/test/utils';
 // eslint-disable-next-line import/no-commonjs
 const WarningIcon = require('./warning-icon.png');
 
-const createStyles = (colors) =>
+interface FallbackProps {
+  errorMessage?: string;
+  showExportSeedphrase?: () => void;
+  copyErrorToClipboard?: () => void;
+  resetError?: () => void;
+  openTicket?: () => void;
+  sentryId?: string;
+}
+
+interface ErrorBoundaryProps extends IWithMetricsAwarenessProps {
+  children: React.ReactNode;
+  view: string;
+  navigation?: NavigationProp<any>;
+}
+
+interface ErrorBoundaryState {
+  error: Error | null;
+  sentryId?: string;
+  backupSeedphrase?: boolean;
+}
+
+const createStyles = (colors: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -224,24 +246,24 @@ const createStyles = (colors) =>
     hitSlop: { top: 50, right: 50, bottom: 50, left: 50 },
   });
 
-export const Fallback = (props) => {
+export const Fallback = (props: FallbackProps): JSX.Element => {
   const { colors } = useTheme();
   const styles = createStyles(colors);
-  const [modalVisible, setModalVisible] = React.useState(false);
-  const [feedback, setFeedback] = React.useState('');
+  const [modalVisible, setModalVisible] = React.useState<boolean>(false);
+  const [feedback, setFeedback] = React.useState<string>('');
   const dataCollectionForMarketing = useSelector(
-    (state) => state.security.dataCollectionForMarketing,
+    (state: any) => state.security.dataCollectionForMarketing,
   );
 
-  const toggleModal = () => {
+  const toggleModal = (): void => {
     setModalVisible((visible) => !visible);
     setFeedback('');
   };
-  const handleContactSupport = () =>
+  const handleContactSupport = (): Promise<any> =>
     Linking.openURL(AppConstants.REVIEW_PROMPT.SUPPORT);
-  const handleTryAgain = () => DevSettings.reload();
+  const handleTryAgain = (): void => DevSettings.reload();
 
-  const handleSubmit = () => {
+  const handleSubmit = (): void => {
     toggleModal();
     captureSentryFeedback({ sentryId: props.sentryId, comments: feedback });
     Alert.alert(strings('error_screen.bug_report_thanks'));
@@ -354,7 +376,6 @@ export const Fallback = (props) => {
                     name={IconName.Close}
                     size={IconSize.Md}
                     color={IconColor.Default}
-                    onPress={toggleModal}
                   />
                 </TouchableOpacity>
               </View>
@@ -395,38 +416,22 @@ export const Fallback = (props) => {
   );
 };
 
-Fallback.propTypes = {
-  errorMessage: PropTypes.string,
-  showExportSeedphrase: PropTypes.func,
-  copyErrorToClipboard: PropTypes.func,
-  sentryId: PropTypes.string,
-};
 
-class ErrorBoundary extends Component {
-  state = { error: null };
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  state: ErrorBoundaryState = { error: null };
 
-  static propTypes = {
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.node),
-      PropTypes.node,
-    ]),
-    view: PropTypes.string.isRequired,
-    navigation: PropTypes.object,
-    metrics: PropTypes.object,
-  };
-
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: Error): { error: Error } {
     return { error };
   }
 
-  generateErrorReport = (error, errorInfo = '') => {
+  generateErrorReport = (error: Error, errorInfo: string = ''): void => {
     const {
       view,
       metrics: { trackEvent, createEventBuilder },
     } = this.props;
-    const analyticsParams = { error: error?.toString(), boundary: view };
+    const analyticsParams: any = { error: error?.toString(), boundary: view };
     // Organize stack trace
-    const stackList = (errorInfo.split('\n') || []).map((stack) =>
+    const stackList = (errorInfo.split('\n') || []).map((stack: string) =>
       stack.trim(),
     );
     // Limit to 5 levels
@@ -439,7 +444,7 @@ class ErrorBoundary extends Component {
     );
   };
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: any): void {
     // Note: Sentry briefly removed this in the next version but eventually added it back in later versions.
     // Read more here - https://github.com/getsentry/sentry-javascript/issues/11951
     const sentryId = getLatestSentryId();
@@ -448,22 +453,22 @@ class ErrorBoundary extends Component {
     Logger.error(error, { View: this.props.view, ...errorInfo });
   }
 
-  resetError = () => {
+  resetError = (): void => {
     this.setState({ error: null });
   };
 
-  showExportSeedphrase = () => {
+  showExportSeedphrase = (): void => {
     this.setState({ backupSeedphrase: true });
   };
 
-  cancelExportSeedphrase = () => {
+  cancelExportSeedphrase = (): void => {
     this.setState({ backupSeedphrase: false });
   };
 
-  getErrorMessage = () =>
+  getErrorMessage = (): string =>
     `View: ${this.props.view}\n${this.state?.error?.toString()}`;
 
-  copyErrorToClipboard = async () => {
+  copyErrorToClipboard = async (): Promise<void> => {
     await ClipboardManager.setString(this.getErrorMessage());
     Alert.alert(
       strings('error_screen.copied_clipboard'),
@@ -475,25 +480,28 @@ class ErrorBoundary extends Component {
     );
   };
 
-  openTicket = () => {
+  openTicket = (): void => {
     const url = 'https://support.metamask.io';
     Linking.openURL(url);
   };
 
-  renderWithSafeArea = (children) => {
+  renderWithSafeArea = (children: React.ReactNode): JSX.Element => {
+    // @ts-expect-error - ThemeContext is intentionally typed as any with TODO to fix
     const colors = this.context.colors || mockTheme.colors;
     const styles = createStyles(colors);
 
     return <SafeAreaView style={styles.container}>{children}</SafeAreaView>;
   };
 
-  render() {
+  render(): React.ReactNode {
     return this.state.backupSeedphrase
       ? this.renderWithSafeArea(
           <RevealPrivateCredential
             credentialName={'seed_phrase'}
             cancel={this.cancelExportSeedphrase}
             navigation={this.props.navigation}
+            // @ts-expect-error - RevealPrivateCredential requires route prop but ErrorBoundary doesn't have access to route
+            route={undefined}
           />,
         )
       : this.state.error
@@ -513,4 +521,5 @@ class ErrorBoundary extends Component {
 
 ErrorBoundary.contextType = ThemeContext;
 
+// @ts-expect-error - withMetricsAwareness HOC typing doesn't account for additional props beyond IWithMetricsAwarenessProps
 export default withMetricsAwareness(ErrorBoundary);
