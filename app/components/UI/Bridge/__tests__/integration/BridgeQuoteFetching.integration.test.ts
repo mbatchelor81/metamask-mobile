@@ -422,7 +422,7 @@ describe('Bridge Quote Fetching Integration Tests', () => {
       );
 
       expect(result.current.bestQuote).toBeNull();
-      expect(result.current.activeQuote).toBeNull();
+      expect(result.current.activeQuote).toBeUndefined();
       expect(result.current.isNoQuotesAvailable).toBe(true);
       expect(result.current.formattedQuoteData).toBeUndefined();
     });
