@@ -1,10 +1,43 @@
  ### Running Tests
 
- ## Unit Tests
+## Unit Tests
 
- ```bash
- yarn test:unit
- ```
+```bash
+yarn test:unit
+```
+
+## Bridge Integration Tests
+
+The Bridge integration tests provide comprehensive coverage of the Bridge quote fetching system, including cross-chain transaction flows, quote validation, timeout handling, and error scenarios with external bridge providers.
+
+**Test Location**: `app/components/UI/Bridge/__tests__/integration/`
+
+### Test Coverage
+
+- **BridgeQuoteFetching.integration.test.ts**: Tests complete quote request lifecycle with debounced updates, cross-chain transaction flows, timeout handling, and error scenarios
+- **CrossChainValidation.integration.test.ts**: Tests EVM-Solana bridge validation, destination address handling, and chain ID validation  
+- **ExternalProviders.integration.test.ts**: Tests external provider response handling, rate limiting, malformed data, and network failures
+
+### Running Bridge Integration Tests
+
+```bash
+# Run all Bridge integration tests
+yarn jest app/components/UI/Bridge/__tests__/integration/
+
+# Run specific integration test file
+yarn jest app/components/UI/Bridge/__tests__/integration/BridgeQuoteFetching.integration.test.ts
+
+# Run with increased timeout for slower systems
+yarn jest app/components/UI/Bridge/__tests__/integration/ --testTimeout=30000
+```
+
+### Key Features Tested
+
+- **Cross-chain flows**: EVM ↔ Solana bridge transaction validation
+- **Quote validation**: Price impact, slippage, network fees, and quote formatting
+- **Timeout handling**: Debounced updates, refresh mechanisms, and expiration logic
+- **Error scenarios**: Network failures, insufficient funds, provider timeouts, and malformed responses
+- **Loading states**: Quote fetching progress and status management
 
 ## E2E Tests Overview
 
