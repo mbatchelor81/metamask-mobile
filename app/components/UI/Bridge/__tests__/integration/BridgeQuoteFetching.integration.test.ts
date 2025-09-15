@@ -496,7 +496,7 @@ describe('Bridge Quote Fetching Integration Tests', () => {
     it('should format destination token amounts correctly', async () => {
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
-          quotes: { recommendedQuote: mockQuoteWithMetadata } as any,
+          quotes: [mockQuoteWithMetadata] as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
@@ -516,7 +516,7 @@ describe('Bridge Quote Fetching Integration Tests', () => {
     it('should calculate quote rates correctly', async () => {
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
-          quotes: { recommendedQuote: mockQuoteWithMetadata } as any,
+          quotes: [mockQuoteWithMetadata] as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
@@ -536,7 +536,7 @@ describe('Bridge Quote Fetching Integration Tests', () => {
     it('should handle network fee formatting', async () => {
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
-          quotes: { recommendedQuote: mockQuoteWithMetadata } as any,
+          quotes: [mockQuoteWithMetadata] as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
@@ -555,7 +555,7 @@ describe('Bridge Quote Fetching Integration Tests', () => {
     it('should handle price impact and slippage formatting', async () => {
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
-          quotes: { recommendedQuote: mockQuoteWithMetadata } as any,
+          quotes: [mockQuoteWithMetadata] as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
