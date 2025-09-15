@@ -7,7 +7,6 @@ import {
   selectIsSolanaSwap,
 } from '../../../../../core/redux/slices/bridge';
 import { useSelector } from 'react-redux';
-import { setupIntegrationTests } from './testSetup';
 import { isSolanaChainId } from '@metamask/bridge-controller';
 
 jest.mock('@metamask/bridge-controller', () => ({
@@ -18,7 +17,6 @@ jest.mock('@metamask/bridge-controller', () => ({
 const mockIsSolanaChainId = isSolanaChainId as jest.MockedFunction<typeof isSolanaChainId>;
 
 describe('Cross-Chain Validation Integration Tests', () => {
-  setupIntegrationTests();
 
   beforeEach(() => {
     mockIsSolanaChainId.mockReset();

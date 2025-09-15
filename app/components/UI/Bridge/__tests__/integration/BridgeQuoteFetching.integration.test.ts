@@ -3,15 +3,15 @@ import { createBridgeTestState } from '../../testUtils';
 import { useBridgeQuoteRequest, DEBOUNCE_WAIT } from '../../hooks/useBridgeQuoteRequest';
 import { useBridgeQuoteData } from '../../hooks/useBridgeQuoteData';
 import Engine from '../../../../../core/Engine';
-import { RequestStatus } from '@metamask/bridge-controller';
+import { RequestStatus, selectBridgeQuotes } from '@metamask/bridge-controller';
 import { act, waitFor } from '@testing-library/react-native';
-import { setupIntegrationTests } from './testSetup';
 import mockQuotes from '../../_mocks_/mock-quotes-sol-sol.json';
 import { mockQuoteWithMetadata } from '../../_mocks_/bridgeQuoteWithMetadata';
 
 jest.mock('@metamask/bridge-controller', () => ({
   ...jest.requireActual('@metamask/bridge-controller'),
   isSolanaChainId: jest.fn(),
+  selectBridgeQuotes: jest.fn(),
 }));
 
 jest.mock('../../hooks/useUnifiedSwapBridgeContext', () => ({
@@ -25,7 +25,20 @@ jest.mock('../../utils/quoteUtils', () => ({
 }));
 
 describe('Bridge Quote Fetching Integration Tests', () => {
-  setupIntegrationTests();
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+    
+    (selectBridgeQuotes as unknown as jest.Mock).mockImplementation(() => ({
+      recommendedQuote: null,
+      alternativeQuotes: [],
+    }));
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
 
   describe('Quote Request Lifecycle', () => {
     it('should fetch quotes with debounced updates and handle loading states', async () => {
@@ -492,6 +505,12 @@ describe('Bridge Quote Fetching Integration Tests', () => {
 
   describe('Quote Data Formatting and Validation', () => {
     it('should format destination token amounts correctly', async () => {
+      // Set up mock for this specific test
+      (selectBridgeQuotes as unknown as jest.Mock).mockImplementation(() => ({
+        recommendedQuote: mockQuoteWithMetadata,
+        alternativeQuotes: [],
+      }));
+
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
           quotes: [mockQuoteWithMetadata] as any,
@@ -499,6 +518,20 @@ describe('Bridge Quote Fetching Integration Tests', () => {
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
           quotesRefreshCount: 0,
+        },
+        bridgeReducerOverrides: {
+          sourceToken: {
+            address: '0x0000000000000000000000000000000000000000',
+            symbol: 'ETH',
+            decimals: 18,
+            chainId: '0x1',
+          },
+          destToken: {
+            address: '0xa0b86a33e6ba3b1c4e6b0b8b8b8b8b8b8b8b8b8b',
+            symbol: 'USDC',
+            decimals: 6,
+            chainId: '0xfa',
+          },
         },
       });
 
@@ -512,6 +545,12 @@ describe('Bridge Quote Fetching Integration Tests', () => {
     });
 
     it('should calculate quote rates correctly', async () => {
+      // Set up mock for this specific test
+      (selectBridgeQuotes as unknown as jest.Mock).mockImplementation(() => ({
+        recommendedQuote: mockQuoteWithMetadata,
+        alternativeQuotes: [],
+      }));
+
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
           quotes: [mockQuoteWithMetadata] as any,
@@ -519,6 +558,20 @@ describe('Bridge Quote Fetching Integration Tests', () => {
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
           quotesRefreshCount: 0,
+        },
+        bridgeReducerOverrides: {
+          sourceToken: {
+            address: '0x0000000000000000000000000000000000000000',
+            symbol: 'ETH',
+            decimals: 18,
+            chainId: '0x1',
+          },
+          destToken: {
+            address: '0xa0b86a33e6ba3b1c4e6b0b8b8b8b8b8b8b8b8b8b',
+            symbol: 'USDC',
+            decimals: 6,
+            chainId: '0xfa',
+          },
         },
       });
 
@@ -532,6 +585,12 @@ describe('Bridge Quote Fetching Integration Tests', () => {
     });
 
     it('should handle network fee formatting', async () => {
+      // Set up mock for this specific test
+      (selectBridgeQuotes as unknown as jest.Mock).mockImplementation(() => ({
+        recommendedQuote: mockQuoteWithMetadata,
+        alternativeQuotes: [],
+      }));
+
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
           quotes: [mockQuoteWithMetadata] as any,
@@ -539,6 +598,20 @@ describe('Bridge Quote Fetching Integration Tests', () => {
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
           quotesRefreshCount: 0,
+        },
+        bridgeReducerOverrides: {
+          sourceToken: {
+            address: '0x0000000000000000000000000000000000000000',
+            symbol: 'ETH',
+            decimals: 18,
+            chainId: '0x1',
+          },
+          destToken: {
+            address: '0xa0b86a33e6ba3b1c4e6b0b8b8b8b8b8b8b8b8b8b',
+            symbol: 'USDC',
+            decimals: 6,
+            chainId: '0xfa',
+          },
         },
       });
 
@@ -551,6 +624,12 @@ describe('Bridge Quote Fetching Integration Tests', () => {
     });
 
     it('should handle price impact and slippage formatting', async () => {
+      // Set up mock for this specific test
+      (selectBridgeQuotes as unknown as jest.Mock).mockImplementation(() => ({
+        recommendedQuote: mockQuoteWithMetadata,
+        alternativeQuotes: [],
+      }));
+
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
           quotes: [mockQuoteWithMetadata] as any,
@@ -558,6 +637,20 @@ describe('Bridge Quote Fetching Integration Tests', () => {
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
           quotesRefreshCount: 0,
+        },
+        bridgeReducerOverrides: {
+          sourceToken: {
+            address: '0x0000000000000000000000000000000000000000',
+            symbol: 'ETH',
+            decimals: 18,
+            chainId: '0x1',
+          },
+          destToken: {
+            address: '0xa0b86a33e6ba3b1c4e6b0b8b8b8b8b8b8b8b8b8b',
+            symbol: 'USDC',
+            decimals: 6,
+            chainId: '0xfa',
+          },
         },
       });
 

@@ -1,15 +1,11 @@
-import { BridgeController, RequestStatus } from '@metamask/bridge-controller';
+import { RequestStatus } from '@metamask/bridge-controller';
 import { createBridgeTestState } from '../../testUtils';
-import Engine from '../../../../../core/Engine';
 import { renderHookWithProvider } from '../../../../../util/test/renderWithProvider';
 import { useBridgeQuoteData } from '../../hooks/useBridgeQuoteData';
-import { useBridgeQuoteRequest } from '../../hooks/useBridgeQuoteRequest';
-import { setupIntegrationTests } from './testSetup';
 import mockQuotes from '../../_mocks_/mock-quotes-sol-sol.json';
 
 jest.mock('@metamask/bridge-controller', () => ({
   ...jest.requireActual('@metamask/bridge-controller'),
-  BridgeController: jest.fn(),
 }));
 
 jest.mock('../../hooks/useUnifiedSwapBridgeContext', () => ({
@@ -23,7 +19,6 @@ jest.mock('../../utils/quoteUtils', () => ({
 }));
 
 describe('External Bridge Providers Integration Tests', () => {
-  setupIntegrationTests();
 
   describe('Provider Response Handling', () => {
     it('should handle successful quote responses from multiple providers', async () => {
@@ -36,11 +31,11 @@ describe('External Bridge Providers Integration Tests', () => {
             destTokenAmount: '1100000000000000000',
           },
         },
-      ] as any;
+      ];
 
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
-          quotes: multipleQuotes,
+          quotes: multipleQuotes as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
@@ -176,11 +171,11 @@ describe('External Bridge Providers Integration Tests', () => {
           ...mockQuotes[0].quote,
           destTokenAmount: null,
         },
-      } as any;
+      };
 
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
-          quotes: [malformedQuote],
+          quotes: [malformedQuote] as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
@@ -198,11 +193,11 @@ describe('External Bridge Providers Integration Tests', () => {
     it('should handle missing quote metadata', async () => {
       const incompleteQuote = {
         quote: mockQuotes[0].quote,
-      } as any;
+      };
 
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
-          quotes: [incompleteQuote],
+          quotes: [incompleteQuote] as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
@@ -225,11 +220,11 @@ describe('External Bridge Providers Integration Tests', () => {
           amount: 'invalid',
           valueInCurrency: 'invalid',
         },
-      } as any;
+      };
 
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
-          quotes: [invalidFeeQuote],
+          quotes: [invalidFeeQuote] as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
@@ -395,11 +390,11 @@ describe('External Bridge Providers Integration Tests', () => {
   describe('Provider Service Degradation', () => {
     it('should handle provider service degradation gracefully', async () => {
       const degradationError = 'Service Degraded: Reduced functionality available';
-      const limitedQuotes = mockQuotes as any;
+      const limitedQuotes = mockQuotes;
 
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
-          quotes: limitedQuotes,
+          quotes: limitedQuotes as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: degradationError,
           quotesLastFetched: Date.now(),
