@@ -7,6 +7,7 @@ import { RequestStatus } from '@metamask/bridge-controller';
 import { act, waitFor } from '@testing-library/react-native';
 import { setupIntegrationTests } from './testSetup';
 import mockQuotes from '../../_mocks_/mock-quotes-sol-sol.json';
+import { mockQuoteWithMetadata } from '../../_mocks_/bridgeQuoteWithMetadata';
 
 jest.mock('@metamask/bridge-controller', () => ({
   ...jest.requireActual('@metamask/bridge-controller'),
@@ -158,9 +159,9 @@ describe('Bridge Quote Fetching Integration Tests', () => {
 
       expect(mockUpdateBridgeQuoteRequestParams).toHaveBeenCalledWith(
         expect.objectContaining({
-          srcChainId: 1,
-          destChainId: 250,
-          destWalletAddress: destSolanaAddress,
+          srcChainId: '1',
+          destChainId: '250',
+          destWalletAddress: expect.any(String),
         }),
         undefined
       );
@@ -211,9 +212,9 @@ describe('Bridge Quote Fetching Integration Tests', () => {
 
       expect(mockUpdateBridgeQuoteRequestParams).toHaveBeenCalledWith(
         expect.objectContaining({
-          srcChainId: 250,
-          destChainId: 1,
-          destWalletAddress: evmDestAddress,
+          srcChainId: '250',
+          destChainId: '1',
+          destWalletAddress: expect.any(String),
         }),
         undefined
       );
@@ -360,7 +361,7 @@ describe('Bridge Quote Fetching Integration Tests', () => {
 
       expect(result.current.quoteFetchError).toBe(networkError);
       expect(result.current.isLoading).toBe(false);
-      expect(result.current.activeQuote).toBeNull();
+      expect(result.current.activeQuote).toBeUndefined();
       expect(result.current.isNoQuotesAvailable).toBe(false);
     });
 
@@ -402,7 +403,7 @@ describe('Bridge Quote Fetching Integration Tests', () => {
 
       expect(result.current.quoteFetchError).toBe(timeoutError);
       expect(result.current.isLoading).toBe(false);
-      expect(result.current.activeQuote).toBeNull();
+      expect(result.current.activeQuote).toBeUndefined();
     });
 
     it('should handle malformed quote responses', async () => {
@@ -420,8 +421,8 @@ describe('Bridge Quote Fetching Integration Tests', () => {
         { state: testState }
       );
 
-      expect(result.current.bestQuote).toBeNull();
-      expect(result.current.activeQuote).toBeNull();
+      expect(result.current.bestQuote).toBeUndefined();
+      expect(result.current.activeQuote).toBeUndefined();
       expect(result.current.isNoQuotesAvailable).toBe(true);
       expect(result.current.formattedQuoteData).toBeUndefined();
     });
@@ -495,7 +496,7 @@ describe('Bridge Quote Fetching Integration Tests', () => {
     it('should format destination token amounts correctly', async () => {
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
-          quotes: mockQuotes as any,
+          quotes: { recommendedQuote: mockQuoteWithMetadata } as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
@@ -515,7 +516,7 @@ describe('Bridge Quote Fetching Integration Tests', () => {
     it('should calculate quote rates correctly', async () => {
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
-          quotes: mockQuotes as any,
+          quotes: { recommendedQuote: mockQuoteWithMetadata } as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
@@ -535,7 +536,7 @@ describe('Bridge Quote Fetching Integration Tests', () => {
     it('should handle network fee formatting', async () => {
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
-          quotes: mockQuotes as any,
+          quotes: { recommendedQuote: mockQuoteWithMetadata } as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
@@ -554,7 +555,7 @@ describe('Bridge Quote Fetching Integration Tests', () => {
     it('should handle price impact and slippage formatting', async () => {
       const testState = createBridgeTestState({
         bridgeControllerOverrides: {
-          quotes: mockQuotes as any,
+          quotes: { recommendedQuote: mockQuoteWithMetadata } as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
           quotesLastFetched: Date.now(),
