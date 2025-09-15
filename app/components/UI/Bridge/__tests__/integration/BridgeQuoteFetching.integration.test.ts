@@ -554,24 +554,8 @@ describe('Bridge Quote Fetching Integration Tests', () => {
           quotes: mockQuotes as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
-        },
-        bridgeReducerOverrides: {
-          sourceToken: {
-            address: '0x0000000000000000000000000000000000000000',
-            symbol: 'SOL',
-            decimals: 9,
-            chainId: '0xfa',
-            name: 'Solana',
-          },
-          destToken: {
-            address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-            symbol: 'USDC',
-            decimals: 6,
-            chainId: '0xfa',
-            name: 'USD Coin',
-          },
-          sourceAmount: '0.5',
-          slippage: '0.5',
+          quotesLastFetched: Date.now(),
+          quotesRefreshCount: 0,
         },
       });
 
