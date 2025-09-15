@@ -498,6 +498,8 @@ describe('Bridge Quote Fetching Integration Tests', () => {
           quotes: mockQuotes as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
+          quotesLastFetched: Date.now(),
+          quotesRefreshCount: 0,
         },
       });
 
@@ -512,13 +514,12 @@ describe('Bridge Quote Fetching Integration Tests', () => {
 
     it('should calculate quote rates correctly', async () => {
       const testState = createBridgeTestState({
-        bridgeReducerOverrides: {
-          sourceAmount: '1.0',
-        },
         bridgeControllerOverrides: {
           quotes: mockQuotes as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
+          quotesLastFetched: Date.now(),
+          quotesRefreshCount: 0,
         },
       });
 
@@ -537,6 +538,8 @@ describe('Bridge Quote Fetching Integration Tests', () => {
           quotes: mockQuotes as any,
           quotesLoadingStatus: RequestStatus.FETCHED,
           quoteFetchError: null,
+          quotesLastFetched: Date.now(),
+          quotesRefreshCount: 0,
         },
       });
 
