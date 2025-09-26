@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import {
   View,
   ScrollView,
@@ -36,6 +36,8 @@ import {
   selectConversionRate,
   selectCurrentCurrency,
 } from '../../../selectors/currencyRateController';
+import { Theme } from '@metamask/design-tokens';
+import { BigNumber } from 'bignumber.js';
 
 const IMAGE_3_RATIO = 281 / 354;
 const IMAGE_2_RATIO = 353 / 416;
@@ -44,7 +46,7 @@ const DEVICE_WIDTH = Dimensions.get('window').width;
 
 const IMG_PADDING = Device.isIphone5() ? 220 : 200;
 
-const createStyles = (colors) =>
+const createStyles = (colors: Theme['colors']) =>
   StyleSheet.create({
     scroll: {
       flexGrow: 1,
@@ -138,21 +140,48 @@ const carousel_images = [
   gas_education_carousel_3,
 ];
 
+interface GasEducationCarouselProps {
+  /**
+   * The navigator object
+   */
+  navigation: NavigationProp<ParamListBase>;
+  /**
+   * conversion rate of ETH - FIAT
+   */
+  conversionRate: number;
+  /**
+   * Selected currency
+   */
+  currentCurrency: string;
+  /**
+   * Object that represents the current route info like params passed to it
+   */
+  route?: {
+    params?: {
+      navigateTo?: () => void;
+    };
+  };
+  /**
+   * Current provider ticker
+   */
+  ticker: string;
+}
+
 /**
  * View that is displayed to first time (new) users
  */
-const GasEducationCarousel = ({
+export const GasEducationCarousel: React.FC<GasEducationCarouselProps> = ({
   navigation,
   route,
   conversionRate,
   currentCurrency,
   ticker,
 }) => {
-  const [currentTab, setCurrentTab] = useState(1);
-  const [gasFiat, setGasFiat] = useState(null);
+  const [currentTab, setCurrentTab] = useState<number>(1);
+  const [gasFiat, setGasFiat] = useState<string | null>(null);
   const { colors } = useTheme();
   const styles = createStyles(colors);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     navigation.setOptions(getTransparentOnboardingNavbarOptions(colors));
@@ -186,6 +215,7 @@ const GasEducationCarousel = ({
             estimatedBaseFeeHex,
             suggestedMaxFeePerGasHex,
             suggestedMaxPriorityFeePerGasHex,
+            estimatedGasLimitHex: gasLimitHex, // Adding required property
           });
           estimatedTotalGas = hexToBN(gasHexes.gasFeeMaxHex);
         } else if (gasEstimates.gasEstimateType === GAS_ESTIMATE_TYPES.LEGACY) {
@@ -213,7 +243,7 @@ const GasEducationCarousel = ({
         const gasFiat = formatCurrency(maxFeePerGasConversion, currentCurrency);
         setGasFiat(gasFiat);
       } catch (e) {
-        Logger.error(e);
+        Logger.error(e as Error);
       }
       setIsLoading(false);
     };
@@ -221,13 +251,13 @@ const GasEducationCarousel = ({
   }, [conversionRate, currentCurrency, ticker]);
 
   const onPresGetStarted = () => {
-    navigation.pop();
+    navigation.goBack();
     route?.params?.navigateTo?.();
   };
 
   const renderTabBar = () => <View />;
 
-  const onChangeTab = (obj) => {
+  const onChangeTab = (obj: { i: number }) => {
     setCurrentTab(obj.i + 1);
   };
 
@@ -239,7 +269,7 @@ const GasEducationCarousel = ({
       },
     });
 
-  const renderText = (key) => {
+  const renderText = (key: number) => {
     if (key === 1) {
       return (
         <View style={styles.tab}>
@@ -327,7 +357,6 @@ const GasEducationCarousel = ({
         >
           <View style={styles.wrapper}>
             <ScrollableTabView
-              style={styles.scrollTabs}
               renderTabBar={renderTabBar}
               onChangeTab={onChangeTab}
             >
@@ -339,7 +368,7 @@ const GasEducationCarousel = ({
                     <View style={styles.carouselImageWrapper}>
                       <Image
                         source={carousel_images[index]}
-                        style={[styles.carouselImage, styles[imgStyleKey]]}
+                        style={[styles.carouselImage, styles[imgStyleKey as keyof typeof styles]]}
                         resizeMethod={'auto'}
                       />
                     </View>
@@ -387,33 +416,10 @@ const GasEducationCarousel = ({
   );
 };
 
-GasEducationCarousel.propTypes = {
-  /**
-   * The navigator object
-   */
-  navigation: PropTypes.object,
-  /**
-    /* conversion rate of ETH - FIAT
-    */
-  conversionRate: PropTypes.any,
-  /**
-    /* Selected currency
-    */
-  currentCurrency: PropTypes.string,
-  /**
-   * Object that represents the current route info like params passed to it
-   */
-  route: PropTypes.object,
-  /**
-   * Current provider ticker
-   */
-  ticker: PropTypes.string,
-};
-
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   conversionRate: selectConversionRate(state),
   currentCurrency: selectCurrentCurrency(state),
   ticker: selectEvmTicker(state),
 });
 
-export default connect(mapStateToProps)(GasEducationCarousel);
+export default connect(mapStateToProps)(GasEducationCarousel as any);
