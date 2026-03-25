@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView,
   Appearance,
 } from 'react-native';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import FeatherIcons from 'react-native-vector-icons/Feather';
@@ -43,7 +42,13 @@ import { MetricsEventBuilder } from '../../../core/Analytics/MetricsEventBuilder
  * View that's shown during the second step of
  * the backup seed phrase flow
  */
-const ManualBackupStep1 = ({ route, navigation, appTheme }) => {
+interface ManualBackupStep1Props {
+  route: any;
+  navigation: any;
+  appTheme: string;
+}
+
+const ManualBackupStep1 = ({ route, navigation, appTheme }: ManualBackupStep1Props) => {
   const [seedPhraseHidden, setSeedPhraseHidden] = useState(true);
 
   const [password, setPassword] = useState(undefined);
@@ -306,22 +311,7 @@ const ManualBackupStep1 = ({ route, navigation, appTheme }) => {
   );
 };
 
-ManualBackupStep1.propTypes = {
-  /**
-  /* navigation object required to push and pop other views
-  */
-  navigation: PropTypes.object,
-  /**
-   * Object that represents the current route info like params passed to it
-   */
-  route: PropTypes.object,
-  /**
-   * Theme that app is set to
-   */
-  appTheme: PropTypes.string,
-};
-
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   appTheme: state.user.appTheme,
 });
 

@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import { SafeAreaView, Text, TextInput, View, StyleSheet } from 'react-native';
-import PropTypes from 'prop-types';
 import { strings } from '../../../../locales/i18n';
 import { fontStyles } from '../../../styles/common';
 import ActionView from '../../UI/ActionView';
@@ -8,6 +7,18 @@ import { getNavigationOptionsTitle } from '../../UI/Navbar';
 import { ThemeContext, mockTheme } from '../../../util/theme';
 
 import { AddBookmarkViewSelectorsIDs } from '../../../../e2e/selectors/Browser/AddBookmarkView.selectors';
+
+interface AddBookmarkProps {
+  navigation: any;
+  route: any;
+}
+
+interface AddBookmarkState {
+  title: string;
+  url: string;
+  warningSymbol?: string;
+  warningDecimals?: string;
+}
 
 const createStyles = (colors) =>
   StyleSheet.create({
@@ -39,21 +50,10 @@ const createStyles = (colors) =>
 /**
  * Copmonent that provides ability to add a bookmark
  */
-export default class AddBookmark extends PureComponent {
-  state = {
+export default class AddBookmark extends PureComponent<AddBookmarkProps, AddBookmarkState> {
+  state: AddBookmarkState = {
     title: '',
     url: '',
-  };
-
-  static propTypes = {
-    /**
-    /* navigation object required to push new views
-    */
-    navigation: PropTypes.object,
-    /**
-     * Object that represents the current route info like params passed to it
-     */
-    route: PropTypes.object,
   };
 
   updateNavBar = () => {

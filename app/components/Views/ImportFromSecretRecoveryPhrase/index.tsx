@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import PropTypes from 'prop-types';
 import {
   ActivityIndicator,
   Alert,
@@ -76,6 +75,15 @@ const IOS_REJECTED_BIOMETRICS_ERROR =
  * using a secret recovery phrase (SRP)
  * The SRP was formally called the seed phrase
  */
+interface ImportFromSecretRecoveryPhraseProps {
+  navigation: any;
+  passwordSet: () => void;
+  setLockTime: (time: number) => void;
+  seedphraseBackedUp: () => void;
+  setOnboardingWizardStep: (step: number) => void;
+  route: any;
+}
+
 const ImportFromSecretRecoveryPhrase = ({
   navigation,
   passwordSet,
@@ -83,7 +91,7 @@ const ImportFromSecretRecoveryPhrase = ({
   seedphraseBackedUp,
   setOnboardingWizardStep,
   route,
-}) => {
+}: ImportFromSecretRecoveryPhraseProps) => {
   const { colors, themeAppearance } = useTheme();
   const styles = createStyles(colors);
 
@@ -607,36 +615,10 @@ const ImportFromSecretRecoveryPhrase = ({
   );
 };
 
-ImportFromSecretRecoveryPhrase.propTypes = {
-  /**
-   * The navigator object
-   */
-  navigation: PropTypes.object,
-  /**
-   * The action to update the password set flag
-   * in the redux store
-   */
-  passwordSet: PropTypes.func,
-  /**
-   * The action to set the locktime
-   * in the redux store
-   */
-  setLockTime: PropTypes.func,
-  /**
-   * The action to update the seedphrase backed up flag
-   * in the redux store
-   */
-  seedphraseBackedUp: PropTypes.func,
-  /**
-   * Action to set onboarding wizard step
-   */
-  setOnboardingWizardStep: PropTypes.func,
-  route: PropTypes.object,
-};
 
-const mapDispatchToProps = (dispatch) => ({
-  setLockTime: (time) => dispatch(setLockTime(time)),
-  setOnboardingWizardStep: (step) => dispatch(setOnboardingWizardStep(step)),
+const mapDispatchToProps = (dispatch: any) => ({
+  setLockTime: (time: number) => dispatch(setLockTime(time)),
+  setOnboardingWizardStep: (step: number) => dispatch(setOnboardingWizardStep(step)),
   passwordSet: () => dispatch(passwordSet()),
   seedphraseBackedUp: () => dispatch(seedphraseBackedUp()),
 });

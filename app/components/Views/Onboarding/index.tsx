@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import {
   ActivityIndicator,
   BackHandler,
@@ -137,42 +136,25 @@ const createStyles = (colors) =>
 /**
  * View that is displayed to first time (new) users
  */
-class Onboarding extends PureComponent {
-  static propTypes = {
-    disableNewPrivacyPolicyToast: PropTypes.func,
-    /**
-     * The navigator object
-     */
-    navigation: PropTypes.object,
-    /**
-     * redux flag that indicates if the user set a password
-     */
-    passwordSet: PropTypes.bool,
-    /**
-     * loading status
-     */
-    loading: PropTypes.bool,
-    /**
-     * set loading status
-     */
-    setLoading: PropTypes.func,
-    /**
-     * unset loading status
-     */
-    unsetLoading: PropTypes.func,
-    /**
-     * loadings msg
-     */
-    loadingMsg: PropTypes.string,
-    /**
-     * Object that represents the current route info like params passed to it
-     */
-    route: PropTypes.object,
-    /**
-     * Metrics injected by withMetricsAwareness HOC
-     */
-    metrics: PropTypes.object,
-  };
+interface OnboardingProps {
+  disableNewPrivacyPolicyToast: () => void;
+  navigation: any;
+  passwordSet: boolean;
+  loading: boolean;
+  setLoading: (msg: string) => void;
+  unsetLoading: () => void;
+  loadingMsg: string;
+  route: any;
+  metrics: any;
+}
+
+interface OnboardingState {
+  warningModalVisible: boolean;
+  loading: boolean;
+  existingUser: boolean;
+}
+
+class Onboarding extends PureComponent<OnboardingProps, OnboardingState> {
 
   notificationAnimated = new Animated.Value(100);
   detailsYAnimated = new Animated.Value(0);
@@ -490,15 +472,15 @@ class Onboarding extends PureComponent {
 
 Onboarding.contextType = ThemeContext;
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   accounts: selectAccounts(state),
   passwordSet: state.user.passwordSet,
   loading: state.user.loadingSet,
   loadingMsg: state.user.loadingMsg,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  setLoading: (msg) => dispatch(loadingSet(msg)),
+const mapDispatchToProps = (dispatch: any) => ({
+  setLoading: (msg: string) => dispatch(loadingSet(msg)),
   unsetLoading: () => dispatch(loadingUnset()),
   disableNewPrivacyPolicyToast: () =>
     dispatch(storePrivacyPolicyClickedOrClosedAction()),
