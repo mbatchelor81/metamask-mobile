@@ -18,7 +18,6 @@ import WalletConnect from '../../../core/WalletConnect/WalletConnect';
 import Logger from '../../../util/Logger';
 import { WALLETCONNECT_SESSIONS } from '../../../constants/storage';
 import { ThemeContext, mockTheme } from '../../../util/theme';
-import PropTypes from 'prop-types';
 import WC2Manager, {
   isWC2Enabled,
 } from '../../../../app/core/WalletConnect/WalletConnectV2';
@@ -81,8 +80,18 @@ const createStyles = (colors) =>
 /**
  * View that displays all the active WalletConnect Sessions
  */
-export default class WalletConnectSessions extends PureComponent {
-  state = {
+interface WalletConnectSessionsProps {
+  navigation: any;
+}
+
+interface WalletConnectSessionsState {
+  ready?: boolean;
+  sessions: any[];
+  sessionsV2: any[];
+}
+
+export default class WalletConnectSessions extends PureComponent<WalletConnectSessionsProps, WalletConnectSessionsState> {
+  state: WalletConnectSessionsState = {
     sessions: [],
     sessionsV2: [],
   };
@@ -279,10 +288,3 @@ export default class WalletConnectSessions extends PureComponent {
 }
 
 WalletConnectSessions.contextType = ThemeContext;
-
-WalletConnectSessions.propTypes = {
-  /**
-   * Navigation object
-   */
-  navigation: PropTypes.object,
-};

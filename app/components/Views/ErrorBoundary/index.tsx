@@ -13,7 +13,6 @@ import {
   Image,
   TextInput,
 } from 'react-native';
-import PropTypes from 'prop-types';
 import { lastEventId as getLatestSentryId } from '@sentry/react-native';
 import { captureSentryFeedback } from '../../../util/sentry/utils';
 import { RevealPrivateCredential } from '../RevealPrivateCredential';
@@ -224,7 +223,16 @@ const createStyles = (colors) =>
     hitSlop: { top: 50, right: 50, bottom: 50, left: 50 },
   });
 
-export const Fallback = (props) => {
+interface FallbackProps {
+  errorMessage: string;
+  showExportSeedphrase: () => void;
+  copyErrorToClipboard: () => void;
+  sentryId?: string;
+  resetError?: () => void;
+  openTicket?: () => void;
+}
+
+export const Fallback = (props: FallbackProps) => {
   const { colors } = useTheme();
   const styles = createStyles(colors);
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -395,25 +403,21 @@ export const Fallback = (props) => {
   );
 };
 
-Fallback.propTypes = {
-  errorMessage: PropTypes.string,
-  showExportSeedphrase: PropTypes.func,
-  copyErrorToClipboard: PropTypes.func,
-  sentryId: PropTypes.string,
-};
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  view: string;
+  navigation: any;
+  metrics: any;
+}
 
-class ErrorBoundary extends Component {
-  state = { error: null };
+interface ErrorBoundaryState {
+  error: Error | null;
+  sentryId?: string;
+  backupSeedphrase?: boolean;
+}
 
-  static propTypes = {
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.node),
-      PropTypes.node,
-    ]),
-    view: PropTypes.string.isRequired,
-    navigation: PropTypes.object,
-    metrics: PropTypes.object,
-  };
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  state: ErrorBoundaryState = { error: null };
 
   static getDerivedStateFromError(error) {
     return { error };

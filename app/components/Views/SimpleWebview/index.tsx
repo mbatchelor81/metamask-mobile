@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import { View } from 'react-native';
 import { WebView } from '@metamask/react-native-webview';
 import { getWebviewNavbar } from '../../UI/Navbar';
@@ -8,17 +7,12 @@ import Logger from '../../../util/Logger';
 import { baseStyles } from '../../../styles/common';
 import { ThemeContext, mockTheme } from '../../../util/theme';
 
-export default class SimpleWebview extends PureComponent {
-  static propTypes = {
-    /**
-     * react-navigation object used to switch between screens
-     */
-    navigation: PropTypes.object,
-    /**
-     * Object that represents the current route info like params passed to it
-     */
-    route: PropTypes.object,
-  };
+interface SimpleWebviewProps {
+  navigation: any;
+  route: any;
+}
+
+export default class SimpleWebview extends PureComponent<SimpleWebviewProps> {
 
   updateNavBar = () => {
     const { navigation, route } = this.props;
