@@ -19,19 +19,19 @@
    */
 
   // helper functions for that ctx
-  function write(buffer, offs) {
-    for (let i = 2; i < arguments.length; i++) {
-      for (let j = 0; j < arguments[i].length; j++) {
-        buffer[offs++] = arguments[i].charAt(j);
+  function write(buffer: string[], offs: number, ...args: string[]): void {
+    for (let i = 0; i < args.length; i++) {
+      for (let j = 0; j < args[i].length; j++) {
+        buffer[offs++] = args[i].charAt(j);
       }
     }
   }
 
-  function byte2(w) {
+  function byte2(w: number): string {
     return String.fromCharCode((w >> 8) & 255, w & 255);
   }
 
-  function byte4(w) {
+  function byte4(w: number): string {
     return String.fromCharCode(
       (w >> 24) & 255,
       (w >> 16) & 255,
@@ -40,7 +40,7 @@
     );
   }
 
-  function byte2lsb(w) {
+  function byte2lsb(w: number): string {
     return String.fromCharCode(w & 255, (w >> 8) & 255);
   }
 
@@ -264,7 +264,7 @@
    * @return  {Array}           The RGB representation
    */
 
-  function hue2rgb(p, q, t) {
+  function hue2rgb(p: number, q: number, t: number): number {
     if (t < 0) t += 1;
     if (t > 1) t -= 1;
     if (t < 1 / 6) return p + (q - p) * 6 * t;
@@ -273,7 +273,7 @@
     return p;
   }
 
-  function hsl2rgb(h, s, l) {
+  function hsl2rgb(h: number, s: number, l: number): [number, number, number, number] {
     let r, g, b;
 
     if (s == 0) {
@@ -292,7 +292,7 @@
   // The random number is a js implementation of the Xorshift PRNG
   const randseed = new Array(4); // Xorshift: [x, y, z, w] 32 bit values
 
-  function seedrand(seed) {
+  function seedrand(seed: string): void {
     for (var i = 0; i < randseed.length; i++) {
       randseed[i] = 0;
     }
@@ -302,7 +302,7 @@
     }
   }
 
-  function rand() {
+  function rand(): number {
     // based on Java's String.hashCode(), expanded to 4 32bit values
     const t = randseed[0] ^ (randseed[0] << 11);
 
@@ -314,7 +314,7 @@
     return (randseed[3] >>> 0) / ((1 << 31) >>> 0);
   }
 
-  function createColor() {
+  function createColor(): [number, number, number] {
     //saturation is the whole color spectrum
     const h = Math.floor(rand() * 360);
     //saturation goes from 40 to 100, it avoids greyish colors
@@ -325,7 +325,7 @@
     return [h / 360, s / 100, l / 100];
   }
 
-  function createImageData(size) {
+  function createImageData(size: number): number[] {
     const width = size; // Only support square icons for now
     const height = size;
 
@@ -352,7 +352,16 @@
     return data;
   }
 
-  function buildOpts(opts) {
+  interface BlockieOpts {
+    seed: string;
+    size?: number;
+    scale?: number;
+    color?: [number, number, number];
+    bgcolor?: [number, number, number];
+    spotcolor?: [number, number, number];
+  }
+
+  function buildOpts(opts: BlockieOpts): Required<BlockieOpts> {
     if (!opts.seed) {
       throw new Error('No seed provided');
     }
@@ -371,7 +380,7 @@
     );
   }
 
-  function toDataUrl(address) {
+  function toDataUrl(address: string): string {
     const cache = Blockies.cache[address];
     if (address && cache) {
       return cache;
@@ -418,5 +427,5 @@
  * of caching Blockies Data URIs
  */
 class Blockies {
-  static cache = {};
+  static cache: Record<string, string> = {};
 }
