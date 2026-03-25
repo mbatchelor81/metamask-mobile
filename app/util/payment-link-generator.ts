@@ -9,7 +9,7 @@ import { getDecimalChainId } from './networks';
  *
  * @returns Payment request universal link / app link
  */
-export function generateUniversalLinkAddress(address) {
+export function generateUniversalLinkAddress(address: string): string {
   return `https://${AppConstants.MM_UNIVERSAL_LINK_HOST}/send/${address}`;
 }
 
@@ -20,7 +20,7 @@ export function generateUniversalLinkAddress(address) {
  *
  * @returns Payment request universal link / app link
  */
-export function generateUniversalLinkRequest(ethereum_link) {
+export function generateUniversalLinkRequest(ethereum_link: string): string {
   const universal_link_format = `https://${AppConstants.MM_UNIVERSAL_LINK_HOST}/send/`;
   return ethereum_link.replace('ethereum:', universal_link_format);
 }
@@ -34,7 +34,7 @@ export function generateUniversalLinkRequest(ethereum_link) {
  *
  * @returns Payment request link, it could throw if errors are found
  */
-export function generateETHLink(receiverAddress, value, chainId) {
+export function generateETHLink(receiverAddress: string, value: string, chainId: string): string {
   const data = {
     chain_id: getDecimalChainId(chainId),
     function_name: undefined,
@@ -58,11 +58,11 @@ export function generateETHLink(receiverAddress, value, chainId) {
  * @returns Payment request link, it could throw if errors are found
  */
 export function generateERC20Link(
-  receiverAddress,
-  assetAddress,
-  value,
-  chainId,
-) {
+  receiverAddress: string,
+  assetAddress: string,
+  value: string,
+  chainId: string,
+): string {
   const data = {
     chain_id: getDecimalChainId(chainId),
     function_name: 'transfer',

@@ -1,4 +1,12 @@
-export const CLIENT_OPTIONS = {
+interface ClientMeta {
+  description: string;
+  url: string;
+  icons: string[];
+  name: string;
+  ssl: boolean;
+}
+
+export const CLIENT_OPTIONS: { clientMeta: ClientMeta } = {
   clientMeta: {
     // Required
     description: 'MetaMask Mobile app',

@@ -20,7 +20,7 @@ import { regex } from '../../app/util/regex';
  * TODO: Replace this entire module and cache with the core ENS controller
  */
 export class ENSCache {
-  static cache = {};
+  static cache: Record<string, { name?: string; timestamp?: number }> = {};
 }
 
 /**
@@ -55,7 +55,7 @@ const CHAIN_ID_TO_NETWORK_ID = {
  * @returns {string|undefined} The cached ENS name, or undefined if the name
  * was not found in the cache.
  */
-export function getCachedENSName(address, chainId) {
+export function getCachedENSName(address: string, chainId: string): string | undefined {
   const networkHasEnsSupport = ENS_SUPPORTED_CHAIN_IDS.includes(chainId);
   if (!networkHasEnsSupport) {
     return undefined;
@@ -67,7 +67,7 @@ export function getCachedENSName(address, chainId) {
   return cacheEntry?.name;
 }
 
-export async function doENSReverseLookup(address, chainId) {
+export async function doENSReverseLookup(this: { ens: unknown }, address: string, chainId: string): Promise<string | undefined> {
   const { provider } =
     Engine.context.NetworkController.getProviderAndBlockTracker();
   const { name: cachedName, timestamp } =
@@ -100,7 +100,7 @@ export async function doENSReverseLookup(address, chainId) {
   }
 }
 
-export async function doENSLookup(ensName, chainId) {
+export async function doENSLookup(this: { ens: unknown }, ensName: string, chainId: string): Promise<string | undefined> {
   const { provider } =
     Engine.context.NetworkController.getProviderAndBlockTracker();
 
@@ -118,6 +118,6 @@ export async function doENSLookup(ensName, chainId) {
   }
 }
 
-export function isDefaultAccountName(name) {
+export function isDefaultAccountName(name: string): boolean {
   return regex.defaultAccount.test(name);
 }
