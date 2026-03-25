@@ -1,10 +1,17 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { View, StyleSheet } from 'react-native';
 
 import SelectorButton from '../../../Base/SelectorButton';
 import Text from '../../../Base/Text';
 import TokenIcon from './TokenIcon';
+
+interface TokenSelectButtonProps {
+  icon?: string;
+  symbol?: string;
+  label?: string;
+  onPress?: () => void;
+  disabled?: boolean;
+}
 
 const styles = StyleSheet.create({
   icon: {
@@ -12,7 +19,7 @@ const styles = StyleSheet.create({
   },
 });
 
-function TokenSelectButton({ icon, symbol, onPress, disabled, label }) {
+function TokenSelectButton({ icon, symbol, onPress, disabled, label }: TokenSelectButtonProps): React.JSX.Element {
   return (
     <SelectorButton onPress={onPress} disabled={disabled}>
       <View style={styles.icon}>
@@ -22,13 +29,5 @@ function TokenSelectButton({ icon, symbol, onPress, disabled, label }) {
     </SelectorButton>
   );
 }
-
-TokenSelectButton.propTypes = {
-  icon: PropTypes.string,
-  symbol: PropTypes.string,
-  label: PropTypes.string,
-  onPress: PropTypes.func,
-  disabled: PropTypes.bool,
-};
 
 export default TokenSelectButton;

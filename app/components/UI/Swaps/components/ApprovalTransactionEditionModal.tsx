@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
 import Modal from 'react-native-modal';
@@ -15,6 +14,29 @@ import {
 import { useTheme } from '../../../../util/theme';
 import Logger from '../../../../util/Logger';
 import { selectSwapsApprovalTransaction } from '../../../../reducers/swaps';
+import type { RootState } from '../../../../reducers';
+
+interface ApprovalTransaction {
+  data: string;
+  [key: string]: unknown;
+}
+
+interface SourceToken {
+  decimals: number;
+  symbol: string;
+  address: string;
+}
+
+interface ApprovalTransactionEditionModalProps {
+  originalApprovalTransaction?: ApprovalTransaction | null;
+  approvalTransaction?: ApprovalTransaction | null;
+  editQuoteTransactionsVisible?: boolean;
+  minimumSpendLimit: string;
+  onCancelEditQuoteTransactions?: () => void;
+  setApprovalTransaction?: (tx: ApprovalTransaction | null) => void;
+  sourceToken: SourceToken;
+  chainId?: string;
+}
 
 const styles = StyleSheet.create({
   keyboardAwareWrapper: {
@@ -36,7 +58,7 @@ function ApprovalTransactionEditionModal({
   sourceToken,
   minimumSpendLimit,
   chainId,
-}) {
+}: ApprovalTransactionEditionModalProps): React.JSX.Element {
   /* Approval transaction if any */
   const [customApprovalTransaction, setCustomApprovalTransaction] =
     useState(approvalTransaction);
@@ -49,7 +71,7 @@ function ApprovalTransactionEditionModal({
   const { colors } = useTheme();
 
   const onSpendLimitCustomValueChange = useCallback(
-    (approvalCustomValue) => setApprovalCustomValue(approvalCustomValue),
+    (approvalCustomValue: string) => setApprovalCustomValue(approvalCustomValue),
     [],
   );
 
@@ -153,18 +175,7 @@ function ApprovalTransactionEditionModal({
   );
 }
 
-ApprovalTransactionEditionModal.propTypes = {
-  approvalTransaction: PropTypes.object,
-  originalApprovalTransaction: PropTypes.object,
-  editQuoteTransactionsVisible: PropTypes.bool,
-  minimumSpendLimit: PropTypes.string.isRequired,
-  onCancelEditQuoteTransactions: PropTypes.func,
-  setApprovalTransaction: PropTypes.func,
-  sourceToken: PropTypes.object,
-  chainId: PropTypes.string,
-};
-
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: RootState) => ({
   originalApprovalTransaction: selectSwapsApprovalTransaction(state),
 });
 

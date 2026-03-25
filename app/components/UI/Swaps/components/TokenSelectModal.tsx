@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import {
   StyleSheet,
   TextInput,
@@ -52,8 +51,38 @@ import { useTheme } from '../../../../util/theme';
 import { QuoteViewSelectorIDs } from '../../../../../e2e/selectors/swaps/QuoteView.selectors';
 import { getDecimalChainId } from '../../../../util/networks';
 import { getSortedTokensByFiatValue } from '../utils/token-list-utils';
+import type { RootState } from '../../../../reducers';
 
-const createStyles = (colors) =>
+interface SwapToken {
+  address: string;
+  symbol: string;
+  name?: string;
+  iconUrl?: string;
+  decimals?: number;
+  balance?: string;
+  balanceFiat?: string;
+  [key: string]: unknown;
+}
+
+interface TokenSelectModalProps {
+  isVisible?: boolean;
+  dismiss?: () => void;
+  title?: string;
+  tokens?: SwapToken[];
+  initialTokens?: SwapToken[];
+  onItemPress?: (item: SwapToken) => void;
+  excludeAddresses?: string[];
+  accounts?: Record<string, unknown>;
+  selectedAddress?: string;
+  currentCurrency?: string;
+  conversionRate?: number;
+  tokenExchangeRates?: Record<string, unknown>;
+  chainId?: string;
+  networkConfigurations?: Record<string, unknown>;
+  balances?: Record<string, unknown>;
+}
+
+const createStyles = (colors: Record<string, Record<string, string>>) =>
   StyleSheet.create({
     modal: {
       margin: 0,
@@ -146,7 +175,7 @@ function TokenSelectModal({
   chainId,
   networkConfigurations,
   balances,
-}) {
+}: TokenSelectModalProps): React.JSX.Element {
   const navigation = useNavigation();
   const { trackEvent, createEventBuilder } = useMetrics();
 
@@ -241,7 +270,7 @@ function TokenSelectModal({
   );
 
   const renderItem = useCallback(
-    ({ item }) => {
+    ({ item }: { item: SwapToken }) => {
       const { balance, balanceFiat } = item;
       const balanceFiatWithCurrencySymbol = balanceFiat
         ? addCurrencySymbol(balanceFiat, currentCurrency)
@@ -285,7 +314,7 @@ function TokenSelectModal({
   }, [showTokenImportModal]);
 
   const handlePressImportToken = useCallback(
-    (item) => {
+    (item: SwapToken) => {
       const { address, symbol } = item;
       trackEvent(
         createEventBuilder(MetaMetricsEvents.CUSTOM_TOKEN_IMPORTED)
@@ -368,7 +397,7 @@ function TokenSelectModal({
     [searchString, styles],
   );
 
-  const handleSearchTextChange = useCallback((text) => {
+  const handleSearchTextChange = useCallback((text: string) => {
     setSearchString(text);
     if (list.current) list.current.scrollToOffset({ animated: false, y: 0 });
   }, []);
@@ -502,7 +531,7 @@ function TokenSelectModal({
             keyboardShouldPersistTaps="always"
             data={tokenSearchResults}
             renderItem={renderItem}
-            keyExtractor={(item) => item.address}
+            keyExtractor={(item: SwapToken) => item.address}
             ListEmptyComponent={renderEmptyList}
             ListFooterComponent={renderFooter}
             ListFooterComponentStyle={[styles.resultRow, styles.footer]}
@@ -513,49 +542,7 @@ function TokenSelectModal({
   );
 }
 
-TokenSelectModal.propTypes = {
-  isVisible: PropTypes.bool,
-  dismiss: PropTypes.func,
-  title: PropTypes.string,
-  tokens: PropTypes.arrayOf(PropTypes.object),
-  initialTokens: PropTypes.arrayOf(PropTypes.object),
-  onItemPress: PropTypes.func,
-  excludeAddresses: PropTypes.arrayOf(PropTypes.string),
-  /**
-   * ETH to current currency conversion rate
-   */
-  conversionRate: PropTypes.number,
-  /**
-   * Map of accounts to information objects including balances
-   */
-  accounts: PropTypes.object,
-  /**
-   * Currency code of the currently-active currency
-   */
-  currentCurrency: PropTypes.string,
-  /**
-   * A string that represents the selected address
-   */
-  selectedAddress: PropTypes.string,
-  /**
-   * An object containing token balances for current account and network in the format address => balance
-   */
-  balances: PropTypes.object,
-  /**
-   * An object containing token exchange rates in the format address => exchangeRate
-   */
-  tokenExchangeRates: PropTypes.object,
-  /**
-   * Chain Id
-   */
-  chainId: PropTypes.string,
-  /**
-   * Network configurations
-   */
-  networkConfigurations: PropTypes.object,
-};
-
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: RootState) => ({
   accounts: selectAccounts(state),
   conversionRate: selectConversionRate(state),
   currentCurrency: selectCurrentCurrency(state),

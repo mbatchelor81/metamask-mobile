@@ -7,7 +7,21 @@ import React, {
 } from 'react';
 import { useSelector } from 'react-redux';
 import { Animated, View, StyleSheet, Image } from 'react-native';
-import PropTypes from 'prop-types';
+
+interface AggregatorMeta {
+  key: string;
+  title?: string;
+  color?: string;
+  iconPng?: string;
+  [key: string]: unknown;
+}
+
+interface LoadingAnimationProps {
+  finish?: boolean;
+  onAnimationEnd?: () => void;
+  aggregatorMetadata?: Record<string, Record<string, unknown>> | null;
+  headPan?: boolean;
+}
 import { selectSelectedNetworkClientId } from '../../../../../selectors/networkController';
 import Engine from '../../../../../core/Engine';
 import Logger from '../../../../../util/Logger';
@@ -36,7 +50,7 @@ const PAN_RADIO = STAGE_SIZE * 0.6;
 // "finalizing" animationg
 const FINALIZING_PERCENTAGE = 80;
 
-const createStyles = (colors, shadows) =>
+const createStyles = (colors: Record<string, Record<string, string>>, shadows: Record<string, Record<string, unknown>>) =>
   StyleSheet.create({
     screen: {
       flex: 1,
@@ -108,8 +122,8 @@ const createStyles = (colors, shadows) =>
     },
   });
 
-function round(value, decimals) {
-  return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+function round(value: number, decimals: number): number {
+  return Number(Math.round(Number(value + 'e' + decimals)) + 'e-' + decimals);
 }
 
 function LoadingAnimation({
@@ -117,8 +131,8 @@ function LoadingAnimation({
   onAnimationEnd,
   aggregatorMetadata,
   headPan = true,
-}) {
-  const [metadata, setMetadata] = useState([]);
+}: LoadingAnimationProps): React.JSX.Element {
+  const [metadata, setMetadata] = useState<AggregatorMeta[]>([]);
   const [shouldStart, setShouldStart] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [hasFinished, setHasFinished] = useState(false);
@@ -183,8 +197,8 @@ function LoadingAnimation({
               [curr.key]: [panRadioX, panRadioY, radioX, radioY],
             };
             // eslint-disable-next-line no-mixed-spaces-and-tabs
-          }, {})
-        : {},
+          }, {} as Record<string, number[]>)
+        : {} as Record<string, number[]>,
     [metadata, headPan],
   );
 
@@ -197,7 +211,7 @@ function LoadingAnimation({
               ...acc,
               [curr.key]: new Animated.Value(0),
             }),
-            {},
+            {} as Record<string, Animated.Value>,
             // eslint-disable-next-line no-mixed-spaces-and-tabs
           )
         : {},
@@ -498,24 +512,5 @@ function LoadingAnimation({
     </View>
   );
 }
-
-LoadingAnimation.propTypes = {
-  /**
-   * Wether to execute the "Finalizing" animation after the main sequence
-   */
-  finish: PropTypes.bool,
-  /**
-   * Function callback executed once both the main sequence and the finalizing animation ends
-   */
-  onAnimationEnd: PropTypes.func,
-  /**
-   * Aggregator metada from Swaps controller API
-   */
-  aggregatorMetadata: PropTypes.object,
-  /**
-   * Wether to show head panning animation with aggregators logos
-   */
-  headPan: PropTypes.bool,
-};
 
 export default LoadingAnimation;

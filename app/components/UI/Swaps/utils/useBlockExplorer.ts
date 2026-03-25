@@ -14,17 +14,39 @@ import {
 } from '../../../../selectors/networkController';
 import { selectNetworkName } from '../../../../selectors/networkInfos';
 
-function useBlockExplorer(networkConfigurations, providerConfigTokenExplorer) {
-  const [explorer, setExplorer] = useState({
+interface ExplorerState {
+  name: string;
+  value: string | null;
+  isValid: boolean;
+  isRPC: boolean;
+  baseUrl: string;
+}
+
+interface ProviderConfig {
+  type: string;
+  rpcUrl?: string;
+}
+
+export interface BlockExplorerResult extends ExplorerState {
+  tx: (hash: string) => string;
+  account: (address: string) => string;
+  token: (address: string) => string;
+}
+
+function useBlockExplorer(
+  networkConfigurations: Record<string, unknown>,
+  providerConfigTokenExplorer?: ProviderConfig | null,
+): BlockExplorerResult {
+  const [explorer, setExplorer] = useState<ExplorerState>({
     name: '',
     value: null,
     isValid: false,
     isRPC: false,
     baseUrl: '',
   });
-  const providerConfig = useSelector(selectProviderConfig);
-  const chainId = useSelector(selectEvmChainId);
-  const networkName = useSelector(selectNetworkName);
+  const providerConfig = useSelector(selectProviderConfig) as ProviderConfig;
+  const chainId = useSelector(selectEvmChainId) as string;
+  const networkName = useSelector(selectNetworkName) as string;
 
   useEffect(() => {
     const definitiveProviderConfig =
@@ -80,7 +102,7 @@ function useBlockExplorer(networkConfigurations, providerConfigTokenExplorer) {
   ]);
 
   const tx = useCallback(
-    (hash) => {
+    (hash: string): string => {
       if (!explorer.isValid) {
         return '';
       }
@@ -93,7 +115,7 @@ function useBlockExplorer(networkConfigurations, providerConfigTokenExplorer) {
     [explorer],
   );
   const account = useCallback(
-    (address) => {
+    (address: string): string => {
       if (!explorer.isValid) {
         return '';
       }
@@ -106,7 +128,7 @@ function useBlockExplorer(networkConfigurations, providerConfigTokenExplorer) {
     [explorer],
   );
   const token = useCallback(
-    (address) => {
+    (address: string): string => {
       if (!explorer.isValid) {
         return '';
       }
