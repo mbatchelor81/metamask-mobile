@@ -9,6 +9,24 @@ import {
 } from './lib/ethereum-chain-utils';
 import { MESSAGE_TYPE } from '../createTracingMiddleware';
 
+interface SwitchEthereumChainRequest {
+  params: Record<string, unknown>[] | null;
+  origin: string;
+  method?: string;
+}
+
+interface SwitchEthereumChainResponse {
+  result: null | unknown;
+}
+
+interface SwitchEthereumChainOptions {
+  req: SwitchEthereumChainRequest;
+  res: SwitchEthereumChainResponse;
+  requestUserApproval: (opts: { type: string; requestData: Record<string, unknown>; origin?: string }) => Promise<void>;
+  analytics: Record<string, unknown>;
+  hooks: Record<string, (...args: unknown[]) => unknown>;
+}
+
 /**
  * Switch chain implementation to be used in JsonRpcEngine middleware.
  *
@@ -25,7 +43,7 @@ export const wallet_switchEthereumChain = async ({
   requestUserApproval,
   analytics,
   hooks,
-}) => {
+}: SwitchEthereumChainOptions): Promise<void> => {
   const {
     CurrencyRateController,
     NetworkController,
@@ -42,17 +60,17 @@ export const wallet_switchEthereumChain = async ({
     });
   }
   const { chainId } = params;
-  const allowedKeys = {
+  const allowedKeys: Record<string, boolean> = {
     chainId: true,
   };
 
-  const extraKeys = Object.keys(params).filter((key) => !allowedKeys[key]);
+  const extraKeys = Object.keys(params as Record<string, unknown>).filter((key) => !allowedKeys[key]);
   if (extraKeys.length) {
     throw rpcErrors.invalidParams(
       `Received unexpected keys on object parameter. Unsupported keys:\n${extraKeys}`,
     );
   }
-  const _chainId = validateChainId(chainId);
+  const _chainId = validateChainId(chainId as string);
   // TODO: [SOLANA] - This do not support non evm networks
   const networkConfigurations = selectEvmNetworkConfigurationsByChainId(
     store.getState(),
