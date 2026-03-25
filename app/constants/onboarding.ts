@@ -1,12 +1,12 @@
 import { strings } from '../../locales/i18n';
 
-export const CHOOSE_PASSWORD_STEPS = [
+export const CHOOSE_PASSWORD_STEPS: string[] = [
   strings('choose_password.title'),
   strings('choose_password.secure'),
   strings('choose_password.confirm'),
 ];
 
-export const MANUAL_BACKUP_STEPS = [
+export const MANUAL_BACKUP_STEPS: string[] = [
   strings('manual_backup.progressOne'),
   strings('manual_backup.progressTwo'),
   strings('manual_backup.progressThree'),

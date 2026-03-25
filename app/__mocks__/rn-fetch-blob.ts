@@ -1,4 +1,4 @@
-const noop = () => ({});
+const noop = (): Record<string, never> => ({});
 
 export default {
   DocumentDir: noop,
