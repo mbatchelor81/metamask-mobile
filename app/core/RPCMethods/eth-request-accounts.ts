@@ -1,8 +1,21 @@
 import { rpcErrors } from '@metamask/rpc-errors';
+import type {
+  JsonRpcRequest,
+  PendingJsonRpcResponse,
+  JsonRpcParams,
+  Json,
+} from '@metamask/utils';
 import { MESSAGE_TYPE } from '../createTracingMiddleware';
 import {
   trackDappViewedEvent,
 } from '../../util/metrics';
+
+interface EthRequestAccountsHooks {
+  getAccounts: (opts: { ignoreLock: boolean }) => string[];
+  getUnlockPromise: (shouldShowUnlockRequest: boolean) => Promise<void>;
+  getCaip25PermissionFromLegacyPermissionsForOrigin: () => unknown;
+  requestPermissionsForOrigin: (permission: unknown) => Promise<void>;
+}
 
 const requestEthereumAccounts = {
   methodNames: [MESSAGE_TYPE.ETH_REQUEST_ACCOUNTS],
@@ -17,7 +30,7 @@ const requestEthereumAccounts = {
 export default requestEthereumAccounts;
 
 // Used to rate-limit pending requests to one per origin
-const locks = new Set();
+const locks = new Set<string>();
 
 /**
  * This method attempts to retrieve the Ethereum accounts available to the
@@ -38,17 +51,17 @@ const locks = new Set();
  * @returns A promise that resolves to nothing
  */
 async function requestEthereumAccountsHandler(
-  req,
-  res,
-  _next,
-  end,
+  req: JsonRpcRequest<JsonRpcParams> & { origin: string },
+  res: PendingJsonRpcResponse<Json>,
+  _next: () => void,
+  end: (error?: unknown) => void,
   {
     getAccounts,
     getUnlockPromise,
     getCaip25PermissionFromLegacyPermissionsForOrigin,
     requestPermissionsForOrigin,
-  },
-) {
+  }: EthRequestAccountsHooks,
+): Promise<void> {
   const { origin } = req;
   if (locks.has(origin)) {
     res.error = rpcErrors.resourceUnavailable(
@@ -87,7 +100,7 @@ async function requestEthereumAccountsHandler(
   // because the accounts will not be in order of lastSelected
   ethAccounts = getAccounts({ ignoreLock: true });
 
-  trackDappViewedEvent(origin, ethAccounts.length);
+  trackDappViewedEvent({ hostname: origin, numberOfConnectedAccounts: ethAccounts.length });
 
   res.result = ethAccounts;
   return end();
