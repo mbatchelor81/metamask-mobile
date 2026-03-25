@@ -4,8 +4,16 @@ import {
   endowmentCaveatSpecifications as snapsEndowmentCaveatSpecifications,
 } from '@metamask/snaps-rpc-methods';
 ///: END:ONLY_INCLUDE_IF
-import {  RestrictedMethods } from './constants';
-import { caip25CaveatBuilder, Caip25CaveatType, caip25EndowmentBuilder, createCaip25Caveat } from '@metamask/chain-agnostic-permission';
+import { RestrictedMethods } from './constants';
+import {
+  caip25CaveatBuilder,
+  Caip25CaveatType,
+  caip25EndowmentBuilder,
+  createCaip25Caveat,
+} from '@metamask/chain-agnostic-permission';
+import type { Hex } from '@metamask/utils';
+import type { NetworkClientId } from '@metamask/network-controller';
+import type { EndowmentCaveatSpecificationConstraint } from '@metamask/permission-controller';
 
 /**
  * This file contains the specifications of the permissions and caveats
@@ -32,27 +40,34 @@ export const CaveatFactories = Object.freeze({
 
 /**
  * A PreferencesController identity object.
- *
- * @typedef {Object} Identity
- * @property {string} address - The address of the identity.
- * @property {string} name - The name of the identity.
- * @property {number} [lastSelected] - Unix timestamp of when the identity was
- * last selected in the UI.
  */
+interface Identity {
+  address: string;
+  name: string;
+  lastSelected?: number;
+}
+
+/**
+ * Options for building caveat specifications.
+ */
+interface GetCaveatSpecificationsOptions {
+  listAccounts?: () => { type: string; address: Hex }[];
+  findNetworkClientIdByChainId?: (chainId: Hex) => NetworkClientId;
+}
 
 /**
  * Gets the specifications for all caveats that will be recognized by the
  * PermissionController.
  *
- * @param {{
- * listAccounts: () => import('@metamask/keyring-api').InternalAccount[],
- * findNetworkClientIdByChainId: (chainId: `0x${string}`) => string,
- * }} options - Options bag.
+ * @param options - Options bag.
+ * @param options.listAccounts - Hook to get internal account objects for all EVM accounts.
+ * @param options.findNetworkClientIdByChainId - Hook to get the networkClientId for a chainId.
+ * @returns The caveat specifications object.
  */
 export const getCaveatSpecifications = ({
   listAccounts,
   findNetworkClientIdByChainId,
-}) => ({
+}: GetCaveatSpecificationsOptions): Record<string, EndowmentCaveatSpecificationConstraint> => ({
   [Caip25CaveatType]: caip25CaveatBuilder({
     listAccounts,
     findNetworkClientIdByChainId,
@@ -67,8 +82,9 @@ export const getCaveatSpecifications = ({
  * Gets the specifications for all permissions that will be recognized by the
  * PermissionController.
  *
+ * @returns The permission specifications object.
  */
-export const getPermissionSpecifications = () => ({
+export const getPermissionSpecifications = (): Record<string, { permissionType: string; targetName: string }> => ({
   [caip25EndowmentBuilder.targetName]:
     caip25EndowmentBuilder.specificationBuilder({}),
 });
