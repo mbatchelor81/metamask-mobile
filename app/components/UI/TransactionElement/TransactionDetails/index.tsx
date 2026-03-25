@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import { TouchableOpacity, StyleSheet, View } from 'react-native';
 import { query } from '@metamask/controller-utils';
 import { connect } from 'react-redux';
@@ -62,7 +61,7 @@ import {
 } from '../../../../constants/urls';
 import { CHAIN_IDS } from '@metamask/transaction-controller';
 
-const createStyles = (colors) =>
+const createStyles = (colors: any) =>
   StyleSheet.create({
     viewOnEtherscan: {
       fontSize: 16,
@@ -112,56 +111,38 @@ const createStyles = (colors) =>
     },
   });
 
+interface TransactionDetailsProps {
+  navigation: any;
+  chainId?: string;
+  transactionObject: any;
+  transactionDetails: any;
+  networkConfigurations?: any;
+  close?: () => void;
+  showSpeedUpModal?: () => void;
+  showCancelModal?: () => void;
+  selectedAddress?: string;
+  transactions?: any[];
+  ticker?: string;
+  tokens?: any;
+  contractExchangeRates?: any;
+  conversionRate?: number;
+  currentCurrency?: string;
+  swapsTransactions?: any;
+  swapsTokens?: any[];
+  primaryCurrency?: string;
+  shouldUseSmartTransaction?: boolean;
+}
+
+interface TransactionDetailsState {
+  rpcBlockExplorer: string | undefined;
+  renderTxActions: boolean;
+  updatedTransactionDetails: any;
+}
+
 /**
  * View that renders a transaction details as part of transactions list
  */
-class TransactionDetails extends PureComponent {
-  static propTypes = {
-    /**
-    /* navigation object required to push new views
-    */
-    navigation: PropTypes.object,
-    /**
-     * Chain Id
-     */
-    chainId: PropTypes.string,
-    /**
-     * Object corresponding to a transaction, containing transaction object, networkId and transaction hash string
-     */
-    transactionObject: PropTypes.object,
-    /**
-     * Object with information to render
-     */
-    transactionDetails: PropTypes.object,
-    /**
-     * Network configurations
-     */
-    networkConfigurations: PropTypes.object,
-    /**
-     * Callback to close the view
-     */
-    close: PropTypes.func,
-    /**
-     * A string representing the network name
-     */
-    showSpeedUpModal: PropTypes.func,
-    showCancelModal: PropTypes.func,
-    selectedAddress: PropTypes.string,
-    transactions: PropTypes.array,
-    ticker: PropTypes.string,
-    tokens: PropTypes.object,
-    contractExchangeRates: PropTypes.object,
-    conversionRate: PropTypes.number,
-    currentCurrency: PropTypes.string,
-    swapsTransactions: PropTypes.object,
-    swapsTokens: PropTypes.array,
-    primaryCurrency: PropTypes.string,
-
-    /**
-     * Boolean that indicates if smart transaction should be used
-     */
-    shouldUseSmartTransaction: PropTypes.bool,
-  };
+class TransactionDetails extends PureComponent<TransactionDetailsProps, TransactionDetailsState> {
 
   state = {
     rpcBlockExplorer: undefined,
@@ -169,7 +150,7 @@ class TransactionDetails extends PureComponent {
     updatedTransactionDetails: undefined,
   };
 
-  fetchTxReceipt = async (transactionHash) => {
+  fetchTxReceipt = async (transactionHash: string) => {
     const ethQuery = getGlobalEthQuery();
     return await query(ethQuery, 'getTransactionReceipt', [transactionHash]);
   };
@@ -181,7 +162,7 @@ class TransactionDetails extends PureComponent {
    * @param {Object} networkConfigurations - The network configurations object
    * @returns {string} The block explorer URL
    */
-  getBlockExplorerForChain = (chainId, txChainId, networkConfigurations) => {
+  getBlockExplorerForChain = (chainId: string, txChainId: string, networkConfigurations: any) => {
     // First check for network configuration block explorer
     let blockExplorer =
       networkConfigurations?.[txChainId]?.blockExplorerUrls[
@@ -509,7 +490,7 @@ class TransactionDetails extends PureComponent {
   };
 }
 
-const mapStateToProps = (state, ownProps) => ({
+const mapStateToProps = (state: any, ownProps: any) => ({
   chainId: selectChainId(state),
   networkConfigurations: selectNetworkConfigurations(state),
   selectedAddress: selectSelectedInternalAccountFormattedAddress(state),
