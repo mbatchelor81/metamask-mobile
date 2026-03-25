@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 import { Alert } from 'react-native';
-import PropTypes from 'prop-types';
 import { connect, useSelector } from 'react-redux';
+import type { RootState } from '../../../reducers';
 import { ethers } from 'ethers';
 import abi from 'human-standard-token-abi';
 
@@ -82,18 +82,37 @@ import SnapAccountCustomNameApproval from '../../Approvals/SnapAccountCustomName
 
 const hstInterface = new ethers.utils.Interface(abi);
 
-function useSwapsTransactions() {
+interface SwapConfirmedEventParams {
+  trackSwaps: (
+    event: (typeof MetaMetricsEvents)[keyof typeof MetaMetricsEvents],
+    transactionMeta: Record<string, unknown>,
+    swapsTransactions: Record<string, unknown>,
+  ) => Promise<void>;
+}
+
+interface RootRPCMethodsUIProps {
+  navigation: Record<string, unknown>;
+  setEtherTransaction: (transaction: Record<string, unknown>) => void;
+  setTransactionObject: (transaction: Record<string, unknown>) => void;
+  tokens: Record<string, unknown>[];
+  selectedAddress: string;
+  chainId: string;
+  shouldUseSmartTransaction: boolean;
+  providerType: string;
+}
+
+function useSwapsTransactions(): Record<string, Record<string, unknown>> {
   const swapTransactions = useSelector(selectSwapsTransactions, isEqual);
 
   // Memo prevents fresh fallback empty object on every render.
   return useMemo(() => swapTransactions ?? {}, [swapTransactions]);
 }
 
-export const useSwapConfirmedEvent = ({ trackSwaps }) => {
+export const useSwapConfirmedEvent = ({ trackSwaps }: SwapConfirmedEventParams) => {
   const [transactionMetaIdsForListening, setTransactionMetaIdsForListening] =
-    useState([]);
+    useState<string[]>([]);
 
-  const addTransactionMetaIdForListening = useCallback((txMetaId) => {
+  const addTransactionMetaIdForListening = useCallback((txMetaId: string) => {
     setTransactionMetaIdsForListening((transactionMetaIdsForListening) => [
       ...transactionMetaIdsForListening,
       txMetaId,
@@ -132,19 +151,19 @@ export const useSwapConfirmedEvent = ({ trackSwaps }) => {
   };
 };
 
-const RootRPCMethodsUI = (props) => {
+const RootRPCMethodsUI = (props: RootRPCMethodsUIProps): React.JSX.Element => {
   const { trackEvent, createEventBuilder } = useMetrics();
-  const [transactionModalType, setTransactionModalType] = useState(undefined);
+  const [transactionModalType, setTransactionModalType] = useState<TransactionModalType | undefined>(undefined);
   const tokenList = useSelector(selectTokenList);
   const setTransactionObject = props.setTransactionObject;
   const setEtherTransaction = props.setEtherTransaction;
 
-  const initializeWalletConnect = () => {
+  const initializeWalletConnect = (): void => {
     WalletConnect.init();
   };
 
   const trackSwaps = useCallback(
-    async (event, transactionMeta, swapsTransactions) => {
+    async (event: (typeof MetaMetricsEvents)[keyof typeof MetaMetricsEvents], transactionMeta: Record<string, any>, swapsTransactions: Record<string, any>) => {
       try {
         const { TransactionController, SmartTransactionsController } =
           Engine.context;
@@ -291,7 +310,7 @@ const RootRPCMethodsUI = (props) => {
   const swapsTransactions = useSwapsTransactions();
 
   const autoSign = useCallback(
-    async (transactionMeta) => {
+    async (transactionMeta: Record<string, any>) => {
       const { KeyringController } = Engine.context;
       const { id: transactionId } = transactionMeta;
 
@@ -344,7 +363,7 @@ const RootRPCMethodsUI = (props) => {
         } else {
           Engine.acceptPendingApproval(transactionMeta.id);
         }
-      } catch (error) {
+      } catch (error: any) {
         if (
           !error?.message.startsWith(KEYSTONE_TX_CANCELED) &&
           !error?.message.startsWith(STX_NO_HASH_ERROR)
@@ -375,7 +394,7 @@ const RootRPCMethodsUI = (props) => {
   );
 
   const onUnapprovedTransaction = useCallback(
-    async (transactionMetaOriginal) => {
+    async (transactionMetaOriginal: Record<string, any>) => {
       const transactionMeta = cloneDeep(transactionMetaOriginal);
 
       if (transactionMeta.origin === TransactionTypes.MMM) return;
@@ -410,7 +429,7 @@ const RootRPCMethodsUI = (props) => {
           (await getMethodData(data, networkClientId)).name ===
             TOKEN_METHOD_TRANSFER
         ) {
-          let asset = props.tokens.find(({ address }) =>
+          let asset: any = props.tokens.find(({ address }: any) =>
             toLowerCaseEquals(address, to),
           );
           if (!asset) {
@@ -488,7 +507,7 @@ const RootRPCMethodsUI = (props) => {
     ],
   );
 
-  const onTransactionComplete = useCallback(() => {
+  const onTransactionComplete = useCallback((): void => {
     setTransactionModalType(undefined);
   }, []);
 
@@ -552,38 +571,7 @@ const RootRPCMethodsUI = (props) => {
   );
 };
 
-RootRPCMethodsUI.propTypes = {
-  /**
-   * Object that represents the navigator
-   */
-  navigation: PropTypes.object,
-  /**
-   * Action that sets an ETH transaction
-   */
-  setEtherTransaction: PropTypes.func,
-  /**
-   * Action that sets a transaction
-   */
-  setTransactionObject: PropTypes.func,
-  /**
-   * Array of ERC20 assets
-   */
-  tokens: PropTypes.array,
-  /**
-   * Selected address
-   */
-  selectedAddress: PropTypes.string,
-  /**
-   * Chain id
-   */
-  chainId: PropTypes.string,
-  /**
-   * If smart transactions should be used
-   */
-  shouldUseSmartTransaction: PropTypes.bool,
-};
-
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: RootState) => ({
   selectedAddress: selectSelectedInternalAccountFormattedAddress(state),
   chainId: selectEvmChainId(state),
   tokens: selectTokens(state),
@@ -594,10 +582,10 @@ const mapStateToProps = (state) => ({
   ),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  setEtherTransaction: (transaction) =>
+const mapDispatchToProps = (dispatch: (action: unknown) => void) => ({
+  setEtherTransaction: (transaction: Record<string, unknown>) =>
     dispatch(setEtherTransaction(transaction)),
-  setTransactionObject: (transaction) =>
+  setTransactionObject: (transaction: Record<string, unknown>) =>
     dispatch(setTransactionObject(transaction)),
 });
 
