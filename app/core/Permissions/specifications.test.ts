@@ -8,10 +8,15 @@ import {
   unrestrictedMethods,
 } from './specifications';
 import { EthAccountType, EthMethod } from '@metamask/keyring-api';
+import type { EthAccountType as EthAccountTypeEnum } from '@metamask/keyring-api';
 import { SnapCaveatType } from '@metamask/snaps-utils';
 
 describe('PermissionController specifications', () => {
-  const baseEoaAccount = {
+  const baseEoaAccount: {
+    type: string;
+    options: Record<string, never>;
+    methods: string[];
+  } = {
     type: EthAccountType.Eoa,
     options: {},
     methods: [
@@ -77,7 +82,7 @@ describe('PermissionController specifications', () => {
             findNetworkClientIdByChainId,
           })[Caip25CaveatType];
 
-          [null, 'foo', {}, []].forEach((invalidValue) => {
+          [null, 'foo', {}, []].forEach((invalidValue: unknown) => {
             expect(() => validator({ value: invalidValue })).toThrow(
               `endowment:caip25 error: Received invalid value for caveat of type "${Caip25CaveatType}".`,
             );
@@ -92,7 +97,7 @@ describe('PermissionController specifications', () => {
             findNetworkClientIdByChainId,
           })[Caip25CaveatType];
 
-          [[{}], [[]], [null], ['']].forEach((invalidValue) => {
+          [[{}], [[]], [null], ['']].forEach((invalidValue: unknown[]) => {
             expect(() => validator({ value: invalidValue })).toThrow(
               `endowment:caip25 error: Received invalid value for caveat of type "${Caip25CaveatType}".`,
             );
@@ -127,7 +132,7 @@ describe('PermissionController specifications', () => {
               ...baseEoaAccount,
             },
           ]);
-          const caveatValues = ['0x1', '0x2', '0x3'];
+          const caveatValues: string[] = ['0x1', '0x2', '0x3'];
 
           const { validator } = getCaveatSpecifications({
             listAccounts,
@@ -144,7 +149,7 @@ describe('PermissionController specifications', () => {
 
   describe('permission specifications', () => {
     it('getPermissionSpecifications returns the expected specifications object', () => {
-      const permissionSpecifications = getPermissionSpecifications({});
+      const permissionSpecifications = getPermissionSpecifications();
       expect(Object.keys(permissionSpecifications)).toHaveLength(1);
       expect(
         permissionSpecifications[Caip25EndowmentPermissionName].targetName,
