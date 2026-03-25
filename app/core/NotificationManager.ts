@@ -427,10 +427,10 @@ class NotificationManager {
     this._transactionFailedListener =
       Engine.controllerMessenger.subscribeOnceIf(
         'TransactionController:transactionFailed',
-        ((payload: { transactionMeta: TransactionMeta }) => {
-          this._failedCallback(payload.transactionMeta);
-        }) as never,
-        ((payload: { transactionMeta: TransactionMeta }) => payload.transactionMeta.id === transaction.id) as never,
+        (transactionMeta: TransactionMeta) => {
+          this._failedCallback(transactionMeta);
+        },
+        (transactionMeta: TransactionMeta) => transactionMeta.id === transaction.id,
       );
 
     this._transactionSpeedupListener =
