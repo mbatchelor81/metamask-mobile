@@ -1,6 +1,6 @@
 import { ETHERSCAN_SUPPORTED_CHAIN_IDS } from '@metamask/preferences-controller';
 
-export default function migrate(state) {
+export default function migrate(state: Record<string, any>): Record<string, any> {
   try {
     Object.values(ETHERSCAN_SUPPORTED_CHAIN_IDS).forEach((hexChainId) => {
       const thirdPartyApiMode = state?.privacy?.thirdPartyApiMode ?? true;
