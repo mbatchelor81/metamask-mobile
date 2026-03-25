@@ -70,8 +70,11 @@ jest.mock('react-native', () => {
  */
 jest.mock('@metamask/react-native-webview', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+  const React = require('react');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
   const { View } = require('react-native');
-  const WebView = (props) => <View {...props} />;
+  const WebView = (props: Record<string, unknown>) =>
+    React.createElement(View, props);
 
   return {
     WebView,
@@ -157,14 +160,14 @@ jest.mock('../../core/NotificationManager', () => ({
   showSimpleNotification: jest.fn(),
 }));
 
-let mockState = {};
+let mockState: Record<string, unknown> = {};
 
 jest.mock('../../store', () => ({
   store: {
     getState: jest.fn().mockImplementation(() => mockState),
     dispatch: jest.fn(),
   },
-  _updateMockState: (state) => {
+  _updateMockState: (state: Record<string, unknown>) => {
     mockState = state;
   },
 }));
@@ -206,12 +209,12 @@ jest.mock('react-native-keychain', () => ({
   },
   getSupportedBiometryType: jest.fn().mockReturnValue('FaceID'),
   setInternetCredentials: jest
-    .fn(('server', 'username', 'password'))
+    .fn()
     .mockResolvedValue({ service: 'metamask', storage: 'storage' }),
   getInternetCredentials: jest
     .fn()
     .mockResolvedValue({ password: 'mock-credentials-password' }),
-  resetInternetCredentials: jest.fn().mockResolvedValue(),
+  resetInternetCredentials: jest.fn().mockResolvedValue(undefined),
   ACCESSIBLE: {
     WHEN_UNLOCKED: 'AccessibleWhenUnlocked',
     AFTER_FIRST_UNLOCK: 'AccessibleAfterFirstUnlock',
@@ -324,10 +327,10 @@ jest.mock('../theme', () => ({
   useAppThemeFromContext: () => ({ ...mockTheme }),
 }));
 
-global.segmentMockClient = null;
+(global as Record<string, unknown>).segmentMockClient = null;
 
-const initializeMockClient = () => {
-  global.segmentMockClient = {
+const initializeMockClient = (): Record<string, jest.Mock> => {
+  const mockClient: Record<string, jest.Mock> = {
     screen: jest.fn(),
     track: jest.fn(),
     identify: jest.fn(),
@@ -337,15 +340,16 @@ const initializeMockClient = () => {
     reset: jest.fn(),
     add: jest.fn(),
   };
-  return global.segmentMockClient;
+  (global as Record<string, unknown>).segmentMockClient = mockClient;
+  return mockClient;
 };
 
 jest.mock('@segment/analytics-react-native', () => {
   class Plugin {
     type = 'utility';
-    analytics = undefined;
+    analytics: unknown = undefined;
 
-    configure(analytics) {
+    configure(analytics: unknown) {
       this.analytics = analytics;
     }
   }
@@ -370,15 +374,15 @@ jest.mock('@notifee/react-native', () =>
 
 jest.mock('react-native/Libraries/Image/resolveAssetSource', () => ({
   __esModule: true,
-  default: (source) => {
+  default: (source: { uri: string }) => {
     return { uri: source.uri };
   },
 }));
 
 jest.mock('redux-persist', () => ({
   persistStore: jest.fn(),
-  persistReducer: (_, reducer) => {
-    return reducer || ((state) => state);
+  persistReducer: (_: unknown, reducer: unknown) => {
+    return reducer || ((state: unknown) => state);
   },
   createTransform: jest.fn(),
   createMigrate: jest.fn(),
@@ -391,8 +395,8 @@ jest.mock('../../store/storage-wrapper', () => ({
 
 // eslint-disable-next-line import/no-commonjs
 require('react-native-reanimated').setUpTests();
-global.__reanimatedWorkletInit = jest.fn();
-global.__DEV__ = false;
+(global as Record<string, unknown>).__reanimatedWorkletInit = jest.fn();
+(global as Record<string, unknown>).__DEV__ = false;
 
 jest.mock('../../core/Engine', () =>
   require('../../core/__mocks__/MockedEngine'),
@@ -405,11 +409,11 @@ jest.mock('react-native-safe-area-context', () => ({
 
 afterEach(() => {
   jest.restoreAllMocks();
-  global.gc && global.gc(true);
+  global.gc && global.gc();
 });
 
-global.crypto = {
-  getRandomValues: (arr) => {
+(global as Record<string, unknown>).crypto = {
+  getRandomValues: (arr: Uint8Array): Uint8Array => {
     const uint8Max = 255;
     for (let i = 0; i < arr.length; i++) {
       arr[i] = Math.floor(Math.random() * (uint8Max + 1));
