@@ -13,4 +13,4 @@ export default {
   },
   MMM: 'MetaMask Mobile',
   MM: 'metamask',
-};
+} as const;
