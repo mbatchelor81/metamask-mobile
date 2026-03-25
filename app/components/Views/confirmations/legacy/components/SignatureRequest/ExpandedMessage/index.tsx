@@ -71,7 +71,6 @@ const createStyles = (colors: any) =>
 /**
  * Component that supports eth_signTypedData and eth_signTypedData_v3
  */
-export default 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ExpandedMessageProps {
   [key: string]: any;
@@ -81,7 +80,7 @@ interface ExpandedMessageState {
   [key: string]: any;
 }
 
-class ExpandedMessage extends PureComponent<ExpandedMessageProps, ExpandedMessageState> {
+export default class ExpandedMessage extends PureComponent<ExpandedMessageProps, ExpandedMessageState> {
   render() {
     const { currentPageInformation, renderMessage, toggleExpandedMessage } =
       this.props;

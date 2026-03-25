@@ -87,7 +87,6 @@ const createStyles = (colors: any) =>
     },
   });
 
-export default 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface TransactionReviewDetailsCardProps {
   [key: string]: any;
@@ -97,7 +96,7 @@ interface TransactionReviewDetailsCardState {
   [key: string]: any;
 }
 
-class TransactionReviewDetailsCard extends Component<TransactionReviewDetailsCardProps, TransactionReviewDetailsCardState> {
+export default class TransactionReviewDetailsCard extends Component<TransactionReviewDetailsCardProps, TransactionReviewDetailsCardState> {
   render() {
     const {
       toggleViewDetails,
