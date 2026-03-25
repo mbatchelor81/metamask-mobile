@@ -20,6 +20,10 @@ import TimeEstimateInfoModal from '../../../../../../UI/TimeEstimateInfoModal';
 import SkeletonComponent from './skeletonComponent';
 import createStyles from './styles';
 
+interface TransactionReviewEIP1559UpdateProps {
+  [key: string]: any;
+}
+
 const TransactionReviewEIP1559Update = ({
   primaryCurrency,
   chainId,
@@ -39,7 +43,7 @@ const TransactionReviewEIP1559Update = ({
   onlyGas,
   updateTransactionState,
   multiLayerL1FeeTotal,
-}) => {
+}: TransactionReviewEIP1559UpdateProps) => {
   const [showLearnMoreModal, setShowLearnMoreModal] = useState(false);
   const [
     isVisibleTimeEstimateInfoModal,

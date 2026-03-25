@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 
-const createStyles = (colors) =>
+const createStyles = (colors: any) =>
   StyleSheet.create({
-    overview: (noMargin) => ({
+    overview: (noMargin: boolean) => ({
       marginHorizontal: noMargin ? 0 : 24,
       paddingTop: 10,
       paddingBottom: 10,

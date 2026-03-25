@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
@@ -16,7 +15,7 @@ import {
   selectCurrentCurrency,
 } from '../../../../../../../selectors/currencyRateController';
 
-const createStyles = (colors) =>
+const createStyles = (colors: any) =>
   StyleSheet.create({
     root: {
       paddingHorizontal: 24,
@@ -78,30 +77,17 @@ const createStyles = (colors) =>
 /**
  * PureComponent that supports reviewing transaction data
  */
-class TransactionReviewData extends PureComponent {
-  static propTypes = {
-    /**
-     * Transaction object associated with this transaction
-     */
-    transaction: PropTypes.object,
-    /**
-     * Transaction corresponding action key
-     */
-    actionKey: PropTypes.string,
-    /**
-     * Hides or shows transaction data
-     */
-    toggleDataView: PropTypes.func,
-    /**
-     * Height of custom gas and data modal
-     */
-    customGasHeight: PropTypes.number,
-    /**
-     * Triggers global alert
-     */
-    showAlert: PropTypes.func,
-  };
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface TransactionReviewDataProps {
+  [key: string]: any;
+}
+
+interface TransactionReviewDataState {
+  [key: string]: any;
+}
+
+class TransactionReviewData extends PureComponent<TransactionReviewDataProps, TransactionReviewDataState> {
   applyRootHeight = () => ({ height: this.props.customGasHeight });
 
   handleCopyHex = () => {
@@ -182,13 +168,13 @@ class TransactionReviewData extends PureComponent {
   };
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   conversionRate: selectConversionRateByChainId(state, state.transaction.chainId),
   currentCurrency: selectCurrentCurrency(state),
   transaction: state.transaction,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
   showAlert: (config) => dispatch(showAlert(config)),
 });
 

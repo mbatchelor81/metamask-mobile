@@ -37,6 +37,10 @@ import InfoModal from '../../../../../UI/Swaps/components/InfoModal';
 import TimeEstimateInfoModal from '../../../../../UI/TimeEstimateInfoModal';
 import createStyles from './styles';
 
+interface EditGasFee1559UpdateProps {
+  [key: string]: any;
+}
+
 const EditGasFee1559Update = ({
   selectedGasValue,
   gasOptions,
@@ -59,7 +63,7 @@ const EditGasFee1559Update = ({
   warning,
   selectedGasObject,
   onlyGas,
-}) => {
+}: EditGasFee1559UpdateProps) => {
   const [modalInfo, updateModalInfo] = useState({
     isVisible: false,
     value: '',
