@@ -43,7 +43,7 @@ function KeypadComponent({
       const newValue = handler(value || '0', pressedKey);
       let valueAsNumber = 0;
       try {
-        valueAsNumber = Number(newValue.replace(decimalSeparator || '', '.'));
+        valueAsNumber = Number(decimalSeparator ? newValue.replace(decimalSeparator, '.') : newValue);
       } catch (error) {
         console.error(error);
       }
