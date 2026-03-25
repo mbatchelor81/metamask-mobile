@@ -39,7 +39,7 @@ import {
 
 const { getSwapsContractAddress } = swapsUtils;
 
-function calculateTotalGas(transaction) {
+function calculateTotalGas(transaction: any): any {
   const {
     gas,
     gasPrice,
@@ -74,7 +74,7 @@ function calculateTotalGas(transaction) {
   return totalGas;
 }
 
-function renderGwei(transaction) {
+function renderGwei(transaction: any): any {
   const {
     gasPrice,
     estimatedBaseFee,
@@ -98,7 +98,7 @@ function renderGwei(transaction) {
   return renderToGwei(gasPrice);
 }
 
-function getTokenTransfer(args) {
+function getTokenTransfer(args: any): [any, any] {
   const {
     tx: {
       txParams: { from, to, data, nonce },
@@ -202,7 +202,7 @@ function getTokenTransfer(args) {
   return [transactionElement, transactionDetails];
 }
 
-function getCollectibleTransfer(args) {
+function getCollectibleTransfer(args: any): [any, any] {
   const {
     tx: {
       txParams: { from, to, data },
@@ -277,7 +277,7 @@ function getCollectibleTransfer(args) {
   return [transactionElement, transactionDetails];
 }
 
-export function decodeIncomingTransfer(args) {
+export function decodeIncomingTransfer(args: any): [any, any] {
   const {
     tx: {
       txParams: { to, from, value },
@@ -389,7 +389,7 @@ export function decodeIncomingTransfer(args) {
   return [transactionElement, transactionDetails];
 }
 
-async function decodeTransferTx(args) {
+async function decodeTransferTx(args: any): Promise<[any, any]> {
   const {
     tx: {
       txParams,
@@ -429,7 +429,7 @@ async function decodeTransferTx(args) {
   return [transactionElement, transactionDetails];
 }
 
-function decodeTransferFromTx(args) {
+function decodeTransferFromTx(args: any): [any, any] {
   const {
     tx: {
       txParams,
@@ -520,7 +520,7 @@ function decodeTransferFromTx(args) {
   return [transactionElement, transactionDetails];
 }
 
-function decodeDeploymentTx(args) {
+function decodeDeploymentTx(args: any): [any, any] {
   const {
     tx: {
       txParams,
@@ -593,7 +593,7 @@ function decodeDeploymentTx(args) {
   return [transactionElement, transactionDetails];
 }
 
-function decodeConfirmTx(args) {
+function decodeConfirmTx(args: any): [any, any] {
   const {
     tx: {
       txParams,
@@ -701,7 +701,7 @@ function decodeConfirmTx(args) {
   return [transactionElement, transactionDetails];
 }
 
-function decodeSwapsTx(args) {
+function decodeSwapsTx(args: any): [any, any] {
   const {
     swapsTransactions,
     swapsTokens,
@@ -911,7 +911,7 @@ function decodeSwapsTx(args) {
  * @param {*} args - Should contain tx, selectedAddress, ticker, conversionRate,
  * currentCurrency, exchangeRate, contractExchangeRates, collectibleContracts, tokens
  */
-export default async function decodeTransaction(args) {
+export default async function decodeTransaction(args: any): Promise<[any, any]> {
   const {
     tx,
     selectedAddress,

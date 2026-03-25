@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { StyleSheet, View, Text } from 'react-native';
 import { fontStyles } from '../../../styles/common';
 import { connect } from 'react-redux';
@@ -20,7 +19,7 @@ import { TransactionReviewSelectorsIDs } from '../../../../e2e/selectors/SendFlo
 
 const { ORIGIN_DEEPLINK, ORIGIN_QR_CODE } = AppConstants.DEEPLINKS;
 
-const createStyles = (colors) =>
+const createStyles = (colors: any) =>
   StyleSheet.create({
     transactionHeader: {
       justifyContent: 'center',
@@ -86,7 +85,21 @@ const createStyles = (colors) =>
 /**
  * PureComponent that renders the transaction header used for signing, granting permissions and sending
  */
-const TransactionHeader = (props) => {
+interface CurrentPageInformation {
+  origin?: string;
+  url?: string;
+  currentEnsName?: string;
+  icon?: string | { uri?: string };
+  spenderAddress?: string;
+}
+
+interface TransactionHeaderProps {
+  currentPageInformation: CurrentPageInformation;
+  networkType?: string;
+  nickname?: string;
+}
+
+const TransactionHeader = (props: TransactionHeaderProps): React.JSX.Element => {
   const { colors } = useTheme();
   const styles = createStyles(colors);
 
@@ -107,7 +120,7 @@ const TransactionHeader = (props) => {
    *
    * @return {element} - JSX view element
    */
-  const renderNetworkStatusIndicator = () => {
+  const renderNetworkStatusIndicator = (): React.JSX.Element => {
     const { networkType } = props;
     const networkStatusIndicatorColor =
       (networkList[networkType] && networkList[networkType].color) ||
@@ -128,7 +141,7 @@ const TransactionHeader = (props) => {
    *
    * @return {element} - JSX image element
    */
-  const renderSecureIcon = () => {
+  const renderSecureIcon = (): React.JSX.Element | null => {
     if (originIsDeeplink) return null;
     const { url, origin } = props.currentPageInformation;
     const name =
@@ -144,7 +157,7 @@ const TransactionHeader = (props) => {
     return <FontAwesome name={name} size={15} style={styles.secureIcon} />;
   };
 
-  const renderTopIcon = () => {
+  const renderTopIcon = (): React.JSX.Element => {
     const { currentEnsName, icon, origin } = props.currentPageInformation;
     let url = props.currentPageInformation.url;
     if (originIsDeeplink && !icon) {
@@ -177,7 +190,7 @@ const TransactionHeader = (props) => {
     );
   };
 
-  const renderTitle = () => {
+  const renderTitle = (): React.JSX.Element => {
     const { url, currentEnsName, spenderAddress, origin } =
       props.currentPageInformation;
     let title = '';
@@ -194,7 +207,7 @@ const TransactionHeader = (props) => {
     return <Text style={styles.domainUrl}>{title}</Text>;
   };
 
-  const renderDomainUrlContainer = () => (
+  const renderDomainUrlContainer = (): React.JSX.Element => (
     <View
       style={styles.domanUrlContainer}
       testID={TransactionReviewSelectorsIDs.TRANSACTION_HEADER_ORIGIN}
@@ -204,7 +217,7 @@ const TransactionHeader = (props) => {
     </View>
   );
 
-  const renderNetworkContainer = () => (
+  const renderNetworkContainer = (): React.JSX.Element => (
     <View style={styles.networkContainer}>
       {renderNetworkStatusIndicator()}
       <Text style={styles.network}>
@@ -225,22 +238,7 @@ const TransactionHeader = (props) => {
   );
 };
 
-TransactionHeader.propTypes = {
-  /**
-   * Object containing current page title and url
-   */
-  currentPageInformation: PropTypes.object,
-  /**
-   * String representing the selected network
-   */
-  networkType: PropTypes.string,
-  /**
-   * Provider name
-   */
-  nickname: PropTypes.string,
-};
-
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   networkType: selectProviderType(state),
   nickname: selectNickname(state),
 });
