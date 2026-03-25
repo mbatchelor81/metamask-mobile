@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import { ScrollView, View, StyleSheet, Text, SafeAreaView } from 'react-native';
-import PropTypes from 'prop-types';
 import CollectibleOverview from '../../UI/CollectibleOverview';
 import { getNetworkNavbarOptions } from '../../UI/Navbar';
 import StyledButton from '../../UI/StyledButton';
@@ -10,8 +9,9 @@ import { connect } from 'react-redux';
 import collectiblesTransferInformation from '../../../util/collectibles-transfer';
 import { newAssetTransaction } from '../../../actions/transaction';
 import { ThemeContext, mockTheme } from '../../../util/theme';
+import type { Theme } from '../../../util/theme/models';
 
-const createStyles = (colors) =>
+const createStyles = (colors: Theme['colors']) =>
   StyleSheet.create({
     root: {
       flex: 1,
@@ -37,27 +37,23 @@ const createStyles = (colors) =>
     },
   });
 
+interface CollectibleViewProps {
+  /** navigation object required to access the props passed by the parent component */
+  navigation: Record<string, any>;
+  /** Start transaction with asset */
+  newAssetTransaction: (selectedAsset: Record<string, any>) => void;
+  /** Object that represents the current route info like params passed to it */
+  route: Record<string, any>;
+}
+
 /**
  * View that displays a specific collectible asset
  */
-class CollectibleView extends PureComponent {
-  static propTypes = {
-    /**
-    /* navigation object required to access the props
-    /* passed by the parent component
-    */
-    navigation: PropTypes.object,
-    /**
-     * Start transaction with asset
-     */
-    newAssetTransaction: PropTypes.func,
-    /**
-     * Object that represents the current route info like params passed to it
-     */
-    route: PropTypes.object,
-  };
+class CollectibleView extends PureComponent<CollectibleViewProps> {
+  declare context: React.ContextType<typeof ThemeContext>;
+  private scrollViewRef = React.createRef<ScrollView>();
 
-  updateNavBar = () => {
+  updateNavBar = (): void => {
     const { navigation, route } = this.props;
     const colors = this.context.colors || mockTheme.colors;
     getNetworkNavbarOptions(
@@ -68,15 +64,15 @@ class CollectibleView extends PureComponent {
     );
   };
 
-  componentDidMount = () => {
+  componentDidMount = (): void => {
     this.updateNavBar();
   };
 
-  componentDidUpdate = () => {
+  componentDidUpdate = (): void => {
     this.updateNavBar();
   };
 
-  onSend = async () => {
+  onSend = async (): Promise<void> => {
     const {
       route: { params },
     } = this.props;
@@ -84,7 +80,7 @@ class CollectibleView extends PureComponent {
     this.props.navigation.navigate('SendFlowView');
   };
 
-  render() {
+  render(): React.ReactNode {
     const {
       route: { params },
       navigation,
@@ -131,8 +127,8 @@ class CollectibleView extends PureComponent {
 
 CollectibleView.contextType = ThemeContext;
 
-const mapDispatchToProps = (dispatch) => ({
-  newAssetTransaction: (selectedAsset) =>
+const mapDispatchToProps = (dispatch: (action: any) => void) => ({
+  newAssetTransaction: (selectedAsset: Record<string, any>) =>
     dispatch(newAssetTransaction(selectedAsset)),
 });
 
