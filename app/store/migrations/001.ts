@@ -5,10 +5,10 @@ import { toLowerCaseEquals } from '../../util/general';
  * MakerDAO DAI => SAI
  *
  **/
-export default function migrate(state) {
-  const tokens = state.engine.backgroundState.TokensController.tokens;
-  const migratedTokens = [];
-  tokens.forEach((token) => {
+export default function migrate(state: Record<string, unknown>): Record<string, unknown> {
+  const tokens = (state as any).engine.backgroundState.TokensController.tokens;
+  const migratedTokens: any[] = [];
+  tokens.forEach((token: any) => {
     if (
       token.symbol === 'DAI' &&
       toLowerCaseEquals(token.address, AppConstants.SAI_ADDRESS)
@@ -17,7 +17,7 @@ export default function migrate(state) {
     }
     migratedTokens.push(token);
   });
-  state.engine.backgroundState.TokensController.tokens = migratedTokens;
+  (state as any).engine.backgroundState.TokensController.tokens = migratedTokens;
 
   return state;
 }
