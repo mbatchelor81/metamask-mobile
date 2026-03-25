@@ -2,9 +2,9 @@ import reducer, { ACTIONS, initialState } from './index';
 import { NotificationTypes } from '../../util/notifications';
 const { TRANSACTION, SIMPLE } = NotificationTypes;
 
-const emptyAction = { type: null };
+const emptyAction = { type: null } as any;
 
-const simpleNotification = (number) => ({
+const simpleNotification = (number: number) => ({
   id: `simple${number}`,
   status: `simple${number} status`,
   duration: 5000,
@@ -12,7 +12,7 @@ const simpleNotification = (number) => ({
   description: `Simple Notification ${number} description}`,
 });
 
-const txNotification = (number) => ({
+const txNotification = (number: number) => ({
   transaction: { id: `tx${number}` },
   status: `tx${number} status`,
   duration: 5000,
@@ -105,41 +105,41 @@ describe('notifications reducer', () => {
   });
 
   describe('actions', () => {
-    let stateWithNotifications;
+    let stateWithNotifications: any;
 
     beforeEach(() => {
       stateWithNotifications = [
-        (state) =>
+        (state: any) =>
           reducer(state, {
             type: ACTIONS.SHOW_SIMPLE_NOTIFICATION,
             ...simpleNotification(0),
           }),
-        (state) =>
+        (state: any) =>
           reducer(state, {
             type: ACTIONS.SHOW_TRANSACTION_NOTIFICATION,
             ...txNotification(1),
           }),
-        (state) =>
+        (state: any) =>
           reducer(state, {
             type: ACTIONS.SHOW_SIMPLE_NOTIFICATION,
             ...simpleNotification(1),
           }),
-        (state) =>
+        (state: any) =>
           reducer(state, {
             type: ACTIONS.SHOW_TRANSACTION_NOTIFICATION,
             ...txNotification(2),
           }),
-        (state) =>
+        (state: any) =>
           reducer(state, {
             type: ACTIONS.SHOW_SIMPLE_NOTIFICATION,
             ...simpleNotification(2),
           }),
-        (state) =>
+        (state: any) =>
           reducer(state, {
             type: ACTIONS.SHOW_SIMPLE_NOTIFICATION,
             ...simpleNotification(3),
           }),
-      ].reduce((acc, current) => current(acc), undefined);
+      ].reduce((acc: any, current) => current(acc), undefined);
     });
 
     it('should hide current notification', () => {

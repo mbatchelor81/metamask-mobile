@@ -1,10 +1,18 @@
+/* eslint-disable @typescript-eslint/default-param-last */
 import { REHYDRATE } from 'redux-persist';
 
-const initialState = {
+export interface WizardState {
+  step: number;
+}
+
+const initialState: WizardState = {
   step: 0,
 };
 
-const onboardingWizardReducer = (state = initialState, action) => {
+const onboardingWizardReducer = (
+  state: WizardState = initialState,
+  action: any,
+): WizardState => {
   switch (action.type) {
     case REHYDRATE:
       return {
