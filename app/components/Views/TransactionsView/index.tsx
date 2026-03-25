@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
-import PropTypes from 'prop-types';
 import { connect, useSelector } from 'react-redux';
 import { withNavigation } from '@react-navigation/compat';
 import { showAlert } from '../../../actions/alert';
@@ -43,7 +42,28 @@ const styles = StyleSheet.create({
   },
 });
 
-const TransactionsView = ({
+interface TransactionsViewProps {
+  /** ETH to current currency conversion rate */
+  conversionRate: number;
+  /** Currency code of the currently-active currency */
+  currentCurrency: string;
+  /** InternalAccount object required to get account name, address and import time */
+  selectedInternalAccount: Record<string, any>;
+  /** navigation object required to push new views */
+  navigation: Record<string, any>;
+  /** An array that represents the user transactions */
+  transactions: Record<string, any>[];
+  /** A string representing the network name */
+  networkType: string;
+  /** Array of ERC20 assets */
+  tokens: Record<string, any>[];
+  /** Current chainId */
+  chainId: string;
+  /** Network tokens filter */
+  tokenNetworkFilter: Record<string, any>;
+}
+
+const TransactionsView: React.FC<TransactionsViewProps> = ({
   navigation,
   conversionRate,
   selectedInternalAccount,
@@ -54,10 +74,10 @@ const TransactionsView = ({
   tokens,
   tokenNetworkFilter,
 }) => {
-  const [allTransactions, setAllTransactions] = useState([]);
-  const [submittedTxs, setSubmittedTxs] = useState([]);
-  const [confirmedTxs, setConfirmedTxs] = useState([]);
-  const [loading, setLoading] = useState();
+  const [allTransactions, setAllTransactions] = useState<Record<string, any>[]>([]);
+  const [submittedTxs, setSubmittedTxs] = useState<Record<string, any>[]>([]);
+  const [confirmedTxs, setConfirmedTxs] = useState<Record<string, any>[]>([]);
+  const [loading, setLoading] = useState<boolean | undefined>();
   const selectedNetworkClientId = useSelector(selectSelectedNetworkClientId);
 
   const selectedAddress = toChecksumHexAddress(
@@ -67,13 +87,13 @@ const TransactionsView = ({
   const isPopularNetwork = useSelector(selectIsPopularNetwork);
 
   const filterTransactions = useCallback(
-    (networkId) => {
+    (networkId: string) => {
       let accountAddedTimeInsertPointFound = false;
       const addedAccountTime = selectedInternalAccount?.metadata.importTime;
 
-      const submittedTxs = [];
-      const confirmedTxs = [];
-      const submittedNonces = [];
+      const submittedTxs: Record<string, any>[] = [];
+      const confirmedTxs: Record<string, any>[] = [];
+      const submittedNonces: string[] = [];
 
       const allTransactionsSorted = sortTransactions(transactions).filter(
         (tx, index, self) =>
@@ -195,46 +215,7 @@ const TransactionsView = ({
   );
 };
 
-TransactionsView.propTypes = {
-  /**
-   * ETH to current currency conversion rate
-   */
-  conversionRate: PropTypes.number,
-  /**
-   * Currency code of the currently-active currency
-   */
-  currentCurrency: PropTypes.string,
-  /**
-   * InternalAccount object required to get account name, address and import time
-   */
-  selectedInternalAccount: PropTypes.object,
-  /**
-   * navigation object required to push new views
-   */
-  navigation: PropTypes.object,
-  /**
-   * An array that represents the user transactions
-   */
-  transactions: PropTypes.array,
-  /**
-   * A string represeting the network name
-   */
-  networkType: PropTypes.string,
-  /**
-   * Array of ERC20 assets
-   */
-  tokens: PropTypes.array,
-  /**
-   * Current chainId
-   */
-  chainId: PropTypes.string,
-  /**
-   * Array of network tokens filter
-   */
-  tokenNetworkFilter: PropTypes.object,
-};
-
-const mapStateToProps = (state) => {
+const mapStateToProps = (state: any) => {
   const chainId = selectChainId(state);
 
   return {
@@ -249,8 +230,8 @@ const mapStateToProps = (state) => {
   };
 };
 
-const mapDispatchToProps = (dispatch) => ({
-  showAlert: (config) => dispatch(showAlert(config)),
+const mapDispatchToProps = (dispatch: (action: any) => void) => ({
+  showAlert: (config: Record<string, any>) => dispatch(showAlert(config)),
 });
 
 export default connect(

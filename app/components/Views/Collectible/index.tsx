@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import { RefreshControl, ScrollView, View, StyleSheet } from 'react-native';
-import PropTypes from 'prop-types';
 import { getNetworkNavbarOptions } from '../../UI/Navbar';
 import { connect } from 'react-redux';
 import Collectibles from '../../UI/Collectibles';
@@ -13,8 +12,9 @@ import { toLowerCaseEquals } from '../../../util/general';
 import { collectiblesSelector } from '../../../reducers/collectibles';
 import { ThemeContext, mockTheme } from '../../../util/theme';
 import { useNftDetectionChainIds } from '../../hooks/useNftDetectionChainIds';
+import type { Theme } from '../../../util/theme/models';
 
-const createStyles = (colors) =>
+const createStyles = (colors: Theme['colors']) =>
   StyleSheet.create({
     wrapper: {
       backgroundColor: colors.background.default,
@@ -22,42 +22,38 @@ const createStyles = (colors) =>
     },
   });
 
+interface CollectibleProps {
+  /** Array of assets (in this case Collectibles) */
+  collectibles: Record<string, any>[];
+  /** navigation object required to access the props passed by the parent component */
+  navigation: Record<string, any>;
+  /** Called to toggle collectible contract information modal */
+  toggleCollectibleContractModal: () => void;
+  /** Whether collectible contract information is visible */
+  collectibleContractModalVisible: boolean;
+  /** Object that represents the current route info like params passed to it */
+  route: Record<string, any>;
+}
+
+interface CollectibleState {
+  refreshing: boolean;
+  collectibles: Record<string, any>[];
+}
+
 /**
  * View that displays a specific collectible
  * including the overview (name, address, symbol, logo, description, total supply)
  * and also individual collectibles list
  */
-class Collectible extends PureComponent {
-  static propTypes = {
-    /**
-     * Array of assets (in this case Collectibles)
-     */
-    collectibles: PropTypes.array,
-    /**
-    /* navigation object required to access the props
-    /* passed by the parent component
-    */
-    navigation: PropTypes.object,
-    /**
-     * Called to toggle collectible contract information modal
-     */
-    toggleCollectibleContractModal: PropTypes.func,
-    /**
-     * Whether collectible contract information is visible
-     */
-    collectibleContractModalVisible: PropTypes.bool,
-    /**
-     * Object that represents the current route info like params passed to it
-     */
-    route: PropTypes.object,
-  };
+class Collectible extends PureComponent<CollectibleProps, CollectibleState> {
+  declare context: React.ContextType<typeof ThemeContext>;
 
   state = {
     refreshing: false,
     collectibles: [],
   };
 
-  updateNavBar = () => {
+  updateNavBar = (): void => {
     const { navigation, route } = this.props;
     const colors = this.context.colors || mockTheme.colors;
     getNetworkNavbarOptions(
@@ -68,15 +64,15 @@ class Collectible extends PureComponent {
     );
   };
 
-  componentDidMount = () => {
+  componentDidMount = (): void => {
     this.updateNavBar();
   };
 
-  componentDidUpdate = () => {
+  componentDidUpdate = (): void => {
     this.updateNavBar();
   };
 
-  onRefresh = async () => {
+  onRefresh = async (): Promise<void> => {
     this.setState({ refreshing: true });
     const { NftDetectionController } = Engine.context;
     const chainIdsToDetectNftsFor = useNftDetectionChainIds();
@@ -87,11 +83,11 @@ class Collectible extends PureComponent {
     }
   };
 
-  hideCollectibleContractModal = () => {
+  hideCollectibleContractModal = (): void => {
     this.props.toggleCollectibleContractModal();
   };
 
-  render = () => {
+  render = (): React.ReactNode => {
     const {
       route: { params },
       navigation,
@@ -168,12 +164,12 @@ class Collectible extends PureComponent {
   };
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   collectibles: collectiblesSelector(state),
   collectibleContractModalVisible: state.modals.collectibleContractModalVisible,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: (action: any) => void) => ({
   toggleCollectibleContractModal: () =>
     dispatch(toggleCollectibleContractModal()),
 });
