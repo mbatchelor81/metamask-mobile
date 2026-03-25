@@ -6,6 +6,15 @@ import createEthAccountsMethodMiddleware from '../RPCMethods/createEthAccountsMe
 import { getPermittedAccounts } from '../Permissions';
 import { getCaip25PermissionFromLegacyPermissions } from '../../util/permissions';
 
+const mockedCreateEip1193MethodMiddleware =
+  createEip1193MethodMiddleware as jest.MockedFunction<
+    typeof createEip1193MethodMiddleware
+  >;
+const mockedCreateEthAccountsMethodMiddleware =
+  createEthAccountsMethodMiddleware as jest.MockedFunction<
+    typeof createEthAccountsMethodMiddleware
+  >;
+
 jest.mock('../../util/permissions', () => ({
   getCaip25PermissionFromLegacyPermissions: jest.fn(),
 }));
@@ -54,7 +63,7 @@ jest.mock('@metamask/eth-json-rpc-filters/subscriptionManager', () => () => ({
   },
 }));
 
-function setupBackgroundBridge(url) {
+function setupBackgroundBridge(url: string): BackgroundBridge {
   // Arrange
   const {
     AccountsController,
@@ -117,7 +126,7 @@ describe('BackgroundBridge', () => {
       const origin = new URL(url).hostname;
       const bridge = setupBackgroundBridge(url);
       const eip1193MethodMiddlewareHooks =
-        createEip1193MethodMiddleware.mock.calls[0][0];
+        mockedCreateEip1193MethodMiddleware.mock.calls[0][0];
 
       // Assert getAccounts
       eip1193MethodMiddlewareHooks.getAccounts();
@@ -184,7 +193,7 @@ describe('BackgroundBridge', () => {
       const url = 'https:www.mock.io';
       const bridge = setupBackgroundBridge(url);
       const ethAccountsMethodMiddlewareHooks =
-        createEthAccountsMethodMiddleware.mock.calls[0][0];
+        mockedCreateEthAccountsMethodMiddleware.mock.calls[0][0];
 
       // Assert getAccounts
       ethAccountsMethodMiddlewareHooks.getAccounts();
