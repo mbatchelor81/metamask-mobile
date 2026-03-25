@@ -16,7 +16,7 @@ describe('Migration #21', () => {
   });
 
   it('should change outdated ipfs gateway to default one', () => {
-    const stateWithIpfsGateway = (ipfsGateway) => ({
+    const stateWithIpfsGateway = (ipfsGateway: string) => ({
       engine: {
         backgroundState: {
           ...backgroundState,
