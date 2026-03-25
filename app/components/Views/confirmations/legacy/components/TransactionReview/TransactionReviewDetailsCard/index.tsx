@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { fontStyles } from '../../../../../../../styles/common';
-import PropTypes from 'prop-types';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import { strings } from '../../../../../../../../locales/i18n';
 import Feather from 'react-native-vector-icons/Feather';
@@ -16,7 +15,7 @@ const {
   ASSET: { ERC20 },
 } = TransactionTypes;
 
-const createStyles = (colors) =>
+const createStyles = (colors: any) =>
   StyleSheet.create({
     uppercase: {
       textTransform: 'capitalize',
@@ -88,25 +87,17 @@ const createStyles = (colors) =>
     },
   });
 
-export default class TransactionReviewDetailsCard extends Component {
-  static propTypes = {
-    toggleViewDetails: PropTypes.func,
-    copyContractAddress: PropTypes.func,
-    toggleViewData: PropTypes.func,
-    address: PropTypes.string,
-    host: PropTypes.string,
-    tokenSpendValue: PropTypes.string,
-    tokenSymbol: PropTypes.string,
-    data: PropTypes.string,
-    displayViewData: PropTypes.bool,
-    method: PropTypes.string,
-    nickname: PropTypes.string,
-    nicknameExists: PropTypes.bool,
-    tokenValue: PropTypes.string,
-    tokenStandard: PropTypes.string,
-    tokenName: PropTypes.string,
-  };
+export default 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface TransactionReviewDetailsCardProps {
+  [key: string]: any;
+}
 
+interface TransactionReviewDetailsCardState {
+  [key: string]: any;
+}
+
+class TransactionReviewDetailsCard extends Component<TransactionReviewDetailsCardProps, TransactionReviewDetailsCardState> {
   render() {
     const {
       toggleViewDetails,

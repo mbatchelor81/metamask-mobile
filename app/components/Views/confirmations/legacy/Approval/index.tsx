@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 import { TransactionEnvelopeType } from '@metamask/transaction-controller';
 import { StyleSheet, AppState, Alert, InteractionManager } from 'react-native';
 import Engine from '../../../../../core/Engine';
-import PropTypes from 'prop-types';
 import TransactionEditor from './components/TransactionEditor';
 import Modal from 'react-native-modal';
 import { safeBNToHex } from '../../../../../util/number';
@@ -75,78 +74,20 @@ const styles = StyleSheet.create({
 /**
  * PureComponent that manages transaction approval from the dapp browser
  */
-class Approval extends PureComponent {
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface ApprovalProps {
+  [key: string]: any;
+}
+
+interface ApprovalState {
+  [key: string]: any;
+}
+
+class Approval extends PureComponent<ApprovalProps, ApprovalState> {
   appStateListener;
 
   #transactionFinishedListener;
-
-  static propTypes = {
-    /**
-     * A string that represents the selected address
-     */
-    selectedAddress: PropTypes.string,
-    /**
-     * react-navigation object used for switching between screens
-     */
-    navigation: PropTypes.object.isRequired,
-    /**
-     * Action that cleans transaction state
-     */
-    resetTransaction: PropTypes.func.isRequired,
-    /**
-     * Transaction state
-     */
-    transaction: PropTypes.object.isRequired,
-    /**
-     * List of transactions
-     */
-    transactions: PropTypes.array,
-    /**
-     * A string representing the network name
-     */
-    networkType: PropTypes.string,
-    /**
-     * Hide dapp transaction modal
-     */
-    hideModal: PropTypes.func,
-    /**
-     * Tells whether or not dApp transaction modal is visible
-     */
-    dappTransactionModalVisible: PropTypes.bool,
-    /**
-     * Indicates whether custom nonce should be shown in transaction editor
-     */
-    showCustomNonce: PropTypes.bool,
-
-    /**
-     * A string representing the network chainId
-     */
-    chainId: PropTypes.string,
-    /**
-     * Metrics injected by withMetricsAwareness HOC
-     */
-    metrics: PropTypes.object,
-
-    /**
-     * Boolean that indicates if smart transaction should be used
-     */
-    shouldUseSmartTransaction: PropTypes.bool,
-
-    /**
-     * Object containing confirmation metrics by id
-     */
-    confirmationMetricsById: PropTypes.object,
-
-    /**
-     * Object containing blockaid validation response for confirmation
-     */
-    securityAlertResponse: PropTypes.object,
-
-    /**
-     * Object containing simulation data
-     */
-    simulationData: PropTypes.object,
-  };
 
   state = {
     mode: REVIEW,
@@ -750,7 +691,7 @@ class Approval extends PureComponent {
   };
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state: any) => {
   const transaction = getNormalizedTxState(state);
   const chainId = transaction?.chainId;
 
@@ -769,7 +710,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
   resetTransaction: () => dispatch(resetTransaction()),
 });
 

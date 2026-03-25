@@ -25,6 +25,10 @@ const LabelElement = (styles, label) => (
   </View>
 );
 
+interface AddressListProps {
+  [key: string]: any;
+}
+
 const AddressList = ({
   chainId,
   inputSearch,
@@ -33,7 +37,7 @@ const AddressList = ({
   onIconPress,
   onlyRenderAddressBook = false,
   reloadAddressList,
-}) => {
+}: AddressListProps) => {
   const { colors } = useTheme();
   const styles = styleSheet(colors);
   const [contactElements, setContactElements] = useState([]);

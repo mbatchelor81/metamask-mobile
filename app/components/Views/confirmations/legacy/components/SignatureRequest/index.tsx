@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -32,7 +31,7 @@ const getCleanUrl = (url) => {
   }
 };
 
-const createStyles = (colors) =>
+const createStyles = (colors: any) =>
   StyleSheet.create({
     root: {
       backgroundColor: colors.background.default,
@@ -125,54 +124,17 @@ const createStyles = (colors) =>
 /**
  * PureComponent that renders scrollable content inside signature request user interface
  */
-class SignatureRequest extends PureComponent {
-  static propTypes = {
-    /**
-     * Callback triggered when this message signature is rejected
-     */
-    onReject: PropTypes.func,
-    /**
-     * Callback triggered when this message signature is approved
-     */
-    onConfirm: PropTypes.func,
-    /**
-     * Content to display above the action buttons
-     */
-    children: PropTypes.node,
-    /**
-     * Object containing current page title and url
-     */
-    currentPageInformation: PropTypes.object,
-    /**
-     * String representing signature type
-     */
-    type: PropTypes.string,
-    /**
-     * String representing the associated network
-     */
-    networkType: PropTypes.string,
-    /**
-     * Whether it should render the expand arrow icon
-     */
-    truncateMessage: PropTypes.bool,
-    /**
-     * Expands the message box on press.
-     */
-    toggleExpandedMessage: PropTypes.func,
-    /**
-     * Active address of account that triggered signing.
-     */
-    fromAddress: PropTypes.string,
-    isSigningQRObject: PropTypes.bool,
-    QRState: PropTypes.object,
-    testID: PropTypes.string,
-    securityAlertResponse: PropTypes.object,
-    /**
-     * Metrics injected by withMetricsAwareness HOC
-     */
-    metrics: PropTypes.object,
-  };
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface SignatureRequestProps {
+  [key: string]: any;
+}
+
+interface SignatureRequestState {
+  [key: string]: any;
+}
+
+class SignatureRequest extends PureComponent<SignatureRequestProps, SignatureRequestState> {
   /**
    * Calls trackCancelSignature and onReject callback
    */
@@ -399,7 +361,7 @@ class SignatureRequest extends PureComponent {
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   selectedAddress: selectSelectedInternalAccountFormattedAddress(state),
   securityAlertResponse: state.signatureRequest.securityAlertResponse,
 });
