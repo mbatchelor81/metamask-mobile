@@ -1,4 +1,25 @@
-export default [
+interface ABIInput {
+  readonly name: string;
+  readonly type: string;
+  readonly indexed?: boolean;
+}
+
+interface ABIOutput {
+  readonly name: string;
+  readonly type: string;
+}
+
+interface ABIEntry {
+  readonly constant?: boolean;
+  readonly anonymous?: boolean;
+  readonly inputs: readonly ABIInput[];
+  readonly name: string;
+  readonly outputs?: readonly ABIOutput[];
+  readonly payable?: boolean;
+  readonly type: 'function' | 'event';
+}
+
+const registryAbi: readonly ABIEntry[] = [
   {
     constant: true,
     inputs: [{ name: 'node', type: 'bytes32' }],
@@ -105,4 +126,6 @@ export default [
     name: 'NewTTL',
     type: 'event',
   },
-];
+] as const;
+
+export default registryAbi;

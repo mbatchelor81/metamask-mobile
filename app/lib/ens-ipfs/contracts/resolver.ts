@@ -1,4 +1,26 @@
-export default [
+interface ABIInput {
+  readonly name: string;
+  readonly type: string;
+  readonly indexed?: boolean;
+}
+
+interface ABIOutput {
+  readonly name: string;
+  readonly type: string;
+}
+
+interface ABIEntry {
+  readonly constant?: boolean;
+  readonly anonymous?: boolean;
+  readonly inputs: readonly ABIInput[];
+  readonly name?: string;
+  readonly outputs?: readonly ABIOutput[];
+  readonly payable?: boolean;
+  readonly stateMutability?: 'pure' | 'view' | 'nonpayable' | 'payable';
+  readonly type: 'function' | 'event' | 'constructor';
+}
+
+const resolverAbi: readonly ABIEntry[] = [
   {
     constant: false,
     inputs: [
@@ -232,4 +254,6 @@ export default [
     name: 'ContenthashChanged',
     type: 'event',
   },
-];
+] as const;
+
+export default resolverAbi;
