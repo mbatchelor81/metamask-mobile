@@ -1,0 +1,195 @@
+///: BEGIN:ONLY_INCLUDE_IF(preinstalled-snaps,external-snaps)
+import {
+  caveatSpecifications as snapsCaveatsSpecifications,
+  endowmentCaveatSpecifications as snapsEndowmentCaveatSpecifications,
+} from '@metamask/snaps-rpc-methods';
+///: END:ONLY_INCLUDE_IF
+import { RestrictedMethods } from './constants';
+import {
+  caip25CaveatBuilder,
+  Caip25CaveatType,
+  caip25EndowmentBuilder,
+  createCaip25Caveat,
+} from '@metamask/chain-agnostic-permission';
+import type { Hex } from '@metamask/utils';
+import type { NetworkClientId } from '@metamask/network-controller';
+import type { EndowmentCaveatSpecificationConstraint } from '@metamask/permission-controller';
+
+/**
+ * This file contains the specifications of the permissions and caveats
+ * that are recognized by our permission system. See the PermissionController
+ * README in @metamask/snaps-controllers for details.
+ */
+
+/**
+ * The "keys" of all of permissions recognized by the PermissionController.
+ * Permission keys and names have distinct meanings in the permission system.
+ */
+export const PermissionKeys = Object.freeze({
+  ...RestrictedMethods,
+  permittedChains: 'endowment:permitted-chains',
+});
+
+/**
+ * Factory functions for all caveat types recognized by the
+ * PermissionController.
+ */
+export const CaveatFactories = Object.freeze({
+  [Caip25CaveatType]: createCaip25Caveat,
+});
+
+/**
+ * A PreferencesController identity object.
+ */
+interface Identity {
+  address: string;
+  name: string;
+  lastSelected?: number;
+}
+
+/**
+ * Options for building caveat specifications.
+ */
+interface GetCaveatSpecificationsOptions {
+  listAccounts?: () => { type: string; address: Hex }[];
+  findNetworkClientIdByChainId?: (chainId: Hex) => NetworkClientId;
+}
+
+/**
+ * Gets the specifications for all caveats that will be recognized by the
+ * PermissionController.
+ *
+ * @param options - Options bag.
+ * @param options.listAccounts - Hook to get internal account objects for all EVM accounts.
+ * @param options.findNetworkClientIdByChainId - Hook to get the networkClientId for a chainId.
+ * @returns The caveat specifications object.
+ */
+export const getCaveatSpecifications = ({
+  listAccounts,
+  findNetworkClientIdByChainId,
+}: GetCaveatSpecificationsOptions): Record<string, EndowmentCaveatSpecificationConstraint> => ({
+  [Caip25CaveatType]: caip25CaveatBuilder({
+    listAccounts,
+    findNetworkClientIdByChainId,
+  }),
+  ///: BEGIN:ONLY_INCLUDE_IF(preinstalled-snaps,external-snaps)
+  ...snapsCaveatsSpecifications,
+  ...snapsEndowmentCaveatSpecifications,
+  ///: END:ONLY_INCLUDE_IF
+});
+
+/**
+ * Gets the specifications for all permissions that will be recognized by the
+ * PermissionController.
+ *
+ * @returns The permission specifications object.
+ */
+export const getPermissionSpecifications = (): Record<string, { permissionType: string; targetName: string }> => ({
+  [caip25EndowmentBuilder.targetName]:
+    caip25EndowmentBuilder.specificationBuilder({}),
+});
+
+/**
+ * All unrestricted methods recognized by the PermissionController.
+ * Unrestricted methods are ignored by the permission system, but every
+ * JSON-RPC request seen by the permission system must correspond to a
+ * restricted or unrestricted method, or the request will be rejected with a
+ * "method not found" error.
+ */
+export const unrestrictedMethods = Object.freeze([
+  'eth_blockNumber',
+  'eth_call',
+  'eth_decrypt',
+  'eth_estimateGas',
+  'eth_feeHistory',
+  'eth_gasPrice',
+  'eth_getBalance',
+  'eth_getBlockByHash',
+  'eth_getBlockByNumber',
+  'eth_getBlockTransactionCountByHash',
+  'eth_getBlockTransactionCountByNumber',
+  'eth_getCode',
+  'eth_getEncryptionPublicKey',
+  'eth_getFilterChanges',
+  'eth_getFilterLogs',
+  'eth_getLogs',
+  'eth_getProof',
+  'eth_getStorageAt',
+  'eth_getTransactionCount',
+  'eth_getTransactionReceipt',
+  'eth_getUncleByBlockHashAndIndex',
+  'eth_getUncleByBlockNumberAndIndex',
+  'eth_getUncleCountByBlockHash',
+  'eth_getUncleCountByBlockNumber',
+  'eth_getWork',
+  'eth_newBlockFilter',
+  'eth_newFilter',
+  'eth_newPendingTransactionFilter',
+  'eth_protocolVersion',
+  'eth_sendRawTransaction',
+  'eth_signTypedData_v1',
+  'eth_submitHashrate',
+  'eth_submitWork',
+  'eth_syncing',
+  'eth_uninstallFilter',
+  'metamask_watchAsset',
+  'net_peerCount',
+  'web3_sha3',
+  // Define unrestricted methods below to bypass PermissionController. These are eventually handled by RPCMethodMiddleware (User facing RPC methods)
+  'wallet_getPermissions',
+  'wallet_requestPermissions',
+  'wallet_revokePermissions',
+  'eth_getTransactionByHash',
+  'eth_getTransactionByBlockHashAndIndex',
+  'eth_getTransactionByBlockNumberAndIndex',
+  'eth_chainId',
+  'eth_hashrate',
+  'eth_mining',
+  'net_listening',
+  'net_version',
+  'eth_requestAccounts',
+  'eth_coinbase',
+  'parity_defaultAccount',
+  'eth_sendTransaction',
+  'personal_sign',
+  'personal_ecRecover',
+  'parity_checkRequest',
+  'eth_signTypedData',
+  'eth_signTypedData_v3',
+  'eth_signTypedData_v4',
+  'web3_clientVersion',
+  'wallet_scanQRCode',
+  'wallet_watchAsset',
+  'metamask_removeFavorite',
+  'metamask_showTutorial',
+  'metamask_showAutocomplete',
+  'metamask_injectHomepageScripts',
+  'metamask_getProviderState',
+  'metamask_logWeb3ShimUsage',
+  'wallet_switchEthereumChain',
+  'wallet_addEthereumChain',
+  'wallet_sendCalls',
+  'wallet_getCallsStatus',
+  ///: BEGIN:ONLY_INCLUDE_IF(preinstalled-snaps,external-snaps)
+  'wallet_getAllSnaps',
+  'wallet_getSnaps',
+  'wallet_requestSnaps',
+  'wallet_invokeSnap',
+  'wallet_invokeKeyring',
+  'snap_getClientStatus',
+  'snap_clearState',
+  'snap_getFile',
+  'snap_getState',
+  'snap_listEntropySources',
+  'snap_createInterface',
+  'snap_updateInterface',
+  'snap_getInterfaceState',
+  'snap_getInterfaceContext',
+  'snap_resolveInterface',
+  'snap_setState',
+  'snap_scheduleBackgroundEvent',
+  'snap_cancelBackgroundEvent',
+  'snap_getBackgroundEvents',
+  'snap_experimentalProviderRequest',
+  ///: END:ONLY_INCLUDE_IF
+]);
