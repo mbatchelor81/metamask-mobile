@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import {
   ScrollView,
   StyleSheet,
@@ -16,7 +15,7 @@ import Device from '../../../util/device';
 import { ThemeContext, mockTheme } from '../../../util/theme';
 
 const ROW_HEIGHT = 35;
-const createStyles = (colors) =>
+const createStyles = (colors: any) =>
   StyleSheet.create({
     dropdown: {
       flexDirection: 'row',
@@ -90,55 +89,53 @@ const createStyles = (colors) =>
     },
   });
 
-export default class SelectComponent extends PureComponent {
-  static propTypes = {
-    /**
-     * Default value to show
-     */
-    defaultValue: PropTypes.string,
-    /**
-     * Label for the field
-     */
-    label: PropTypes.string,
-    /**
-     * Selected value
-     */
-    selectedValue: PropTypes.string,
-    /**
-     *  Available options
-     */
-    options: PropTypes.array,
-    /**
-     * Callback for value change
-     */
-    onValueChange: PropTypes.func,
-    testID: PropTypes.string,
-  };
+interface SelectOption {
+  value: string;
+  label: string;
+  key: string;
+}
 
-  state = {
+interface SelectComponentProps {
+  defaultValue?: string;
+  label?: string;
+  selectedValue?: string;
+  options?: SelectOption[];
+  onValueChange?: (val: string) => void;
+  testID?: string;
+}
+
+interface SelectComponentState {
+  pickerVisible: boolean;
+}
+
+export default class SelectComponent extends PureComponent<SelectComponentProps, SelectComponentState> {
+  declare context: React.ContextType<typeof ThemeContext>;
+
+  state: SelectComponentState = {
     pickerVisible: false,
   };
 
-  scrollView = Device.isIos() ? React.createRef() : null;
+  scrollView = Device.isIos() ? React.createRef<ScrollView>() : null;
 
-  onValueChange = (val) => {
-    this.props.onValueChange(val);
+  onValueChange = (val: string): void => {
+    this.props.onValueChange?.(val);
     setTimeout(() => {
       this.hidePicker();
     }, 1000);
   };
 
-  hidePicker = () => {
+  hidePicker = (): void => {
     this.setState({ pickerVisible: false });
   };
 
-  showPicker = () => {
+  showPicker = (): void => {
     dismissKeyboard();
     this.setState({ pickerVisible: true });
     Device.isIos() &&
       // If there are more options than 13 (number of items
       // that should fit in a normal screen)
       // then let's scroll to the selected item
+      this.props.options &&
       this.props.options.length > 13 &&
       this.props.options.forEach((item, i) => {
         if (item.value === this.props.selectedValue) {
@@ -155,10 +152,10 @@ export default class SelectComponent extends PureComponent {
       });
   };
 
-  getSelectedValue = () => {
+  getSelectedValue = (): string => {
     const { options, selectedValue, defaultValue } = this.props;
     const el = options && options.filter((o) => o.value === selectedValue);
-    if (el.length && el[0].label) {
+    if (el && el.length && el[0].label) {
       return el[0].label;
     }
     if (defaultValue) {
@@ -167,8 +164,8 @@ export default class SelectComponent extends PureComponent {
     return '';
   };
 
-  renderDropdownSelector = () => {
-    const colors = this.context.colors || mockTheme.colors;
+  renderDropdownSelector = (): React.JSX.Element => {
+    const colors = this.context?.colors || mockTheme.colors;
     const styles = createStyles(colors);
 
     return (
@@ -202,7 +199,7 @@ export default class SelectComponent extends PureComponent {
             </View>
             <ScrollView style={styles.list} ref={this.scrollView}>
               <View style={styles.listWrapper}>
-                {this.props.options.map((option) => (
+                {this.props.options?.map((option) => (
                   <TouchableOpacity
                     // eslint-disable-next-line react/jsx-no-bind
                     onPress={() => this.onValueChange(option.value)}
@@ -230,7 +227,7 @@ export default class SelectComponent extends PureComponent {
     );
   };
 
-  render = () => (
+  render = (): React.JSX.Element => (
     <View style={baseStyles.flexGrow}>{this.renderDropdownSelector()}</View>
   );
 }

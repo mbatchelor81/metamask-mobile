@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import {
   InteractionManager,
@@ -46,7 +45,7 @@ import { withMetricsAwareness } from '../../../components/hooks/useMetrics';
 import { isPortfolioUrl } from '../../../util/url';
 import { toLowerCaseEquals } from '../../../util/general';
 
-const createStyles = (colors) =>
+const createStyles = (colors: any) =>
   StyleSheet.create({
     scrollView: {
       backgroundColor: colors.background.default,
@@ -142,69 +141,49 @@ const createStyles = (colors) =>
     portfolioIcon: { color: colors.primary.default },
   });
 
+interface BrowserTab {
+  id: string;
+  url: string;
+}
+
+interface AccountOverviewProps {
+  selectedAddress?: string;
+  internalAccounts?: any[];
+  account?: any;
+  showAlert?: (config: any) => void;
+  onboardingWizard?: boolean;
+  onRef?: (ref: any) => void;
+  protectWalletModalVisible?: () => void;
+  navigation?: any;
+  chainId?: string;
+  browserTabs?: BrowserTab[];
+  metrics?: any;
+}
+
+interface AccountOverviewState {
+  accountLabelEditable: boolean;
+  accountLabel: string;
+  originalAccountLabel: string;
+  ens: string | undefined;
+}
+
 /**
  * View that's part of the <Wallet /> component
  * which shows information about the selected account
  */
-class AccountOverview extends PureComponent {
-  static propTypes = {
-    /**
-     * String that represents the selected address
-     */
-    selectedAddress: PropTypes.string,
-    /**
-    /* InternalAccounts object required to get account name
-    */
-    internalAccounts: PropTypes.object,
-    /**
-     * Object that represents the selected account
-     */
-    account: PropTypes.object,
-    /**
-    /* Triggers global alert
-    */
-    showAlert: PropTypes.func,
-    /**
-     * whether component is being rendered from onboarding wizard
-     */
-    onboardingWizard: PropTypes.bool,
-    /**
-     * Used to get child ref
-     */
-    onRef: PropTypes.func,
-    /**
-     * Prompts protect wallet modal
-     */
-    protectWalletModalVisible: PropTypes.func,
-    /**
-    /* navigation object required to access the props
-    /* passed by the parent component
-    */
-    navigation: PropTypes.object,
-    /**
-     * The chain ID for the current selected network
-     */
-    chainId: PropTypes.string,
-    /**
-     * Current opens tabs in browser
-     */
-    browserTabs: PropTypes.array,
-    /**
-     * Metrics injected by withMetricsAwareness HOC
-     */
-    metrics: PropTypes.object,
-  };
+class AccountOverview extends PureComponent<AccountOverviewProps, AccountOverviewState> {
+  declare context: React.ContextType<typeof ThemeContext>;
 
-  state = {
+  state: AccountOverviewState = {
     accountLabelEditable: false,
     accountLabel: '',
     originalAccountLabel: '',
     ens: undefined,
   };
 
-  editableLabelRef = React.createRef();
-  scrollViewContainer = React.createRef();
-  mainView = React.createRef();
+  editableLabelRef = React.createRef<View>();
+  scrollViewContainer = React.createRef<View>();
+  mainView = React.createRef<View>();
 
   openAccountSelector = () => {
     const { onboardingWizard, navigation } = this.props;
@@ -212,10 +191,10 @@ class AccountOverview extends PureComponent {
       navigation.navigate(...createAccountSelectorNavDetails({}));
   };
 
-  isAccountLabelDefined = (accountLabel) =>
+  isAccountLabelDefined = (accountLabel: string) =>
     !!accountLabel && !!accountLabel.trim().length;
 
-  input = React.createRef();
+  input = React.createRef<TextInput>();
 
   componentDidMount = () => {
     const { internalAccounts, selectedAddress, onRef } = this.props;
@@ -231,7 +210,7 @@ class AccountOverview extends PureComponent {
     }
   };
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: AccountOverviewProps) {
     if (
       prevProps.account.address !== this.props.account.address ||
       prevProps.chainId !== this.props.chainId
@@ -246,7 +225,7 @@ class AccountOverview extends PureComponent {
     const { selectedAddress, internalAccounts } = this.props;
     const { accountLabel } = this.state;
 
-    const accountWithMatchingToAddress = internalAccounts.find((account) =>
+    const accountWithMatchingToAddress = internalAccounts?.find((account: any) =>
       toLowerCaseEquals(account.address, selectedAddress),
     );
 
@@ -254,12 +233,12 @@ class AccountOverview extends PureComponent {
       selectedAddress,
       this.isAccountLabelDefined(accountLabel)
         ? accountLabel
-        : accountWithMatchingToAddress.metadata.name,
+        : accountWithMatchingToAddress?.metadata?.name,
     );
     this.setState({ accountLabelEditable: false });
   };
 
-  onAccountLabelChange = (accountLabel) => {
+  onAccountLabelChange = (accountLabel: string) => {
     this.setState({ accountLabel });
   };
 
@@ -281,13 +260,13 @@ class AccountOverview extends PureComponent {
   copyAccountToClipboard = async () => {
     const { selectedAddress } = this.props;
     await ClipboardManager.setString(selectedAddress);
-    this.props.showAlert({
+    this.props.showAlert?.({
       isVisible: true,
       autodismiss: 1500,
       content: 'clipboard-alert',
       data: { msg: strings('account_details.account_copied_to_clipboard') },
     });
-    setTimeout(() => this.props.protectWalletModalVisible(), 2000);
+    setTimeout(() => this.props.protectWalletModalVisible?.(), 2000);
 
     this.props.metrics.trackEvent(
       this.props.metrics
@@ -296,7 +275,7 @@ class AccountOverview extends PureComponent {
     );
   };
 
-  doENSLookup = async () => {
+  doENSLookup = async (): Promise<void> => {
     const { chainId, account } = this.props;
     try {
       const ens = await doENSReverseLookup(account.address, chainId);
@@ -306,7 +285,7 @@ class AccountOverview extends PureComponent {
   };
 
   onOpenPortfolio = () => {
-    const { navigation, browserTabs } = this.props;
+    const { navigation, browserTabs = [] } = this.props;
     const existingPortfolioTab = browserTabs.find((tab) =>
       isPortfolioUrl(tab.url),
     );
@@ -339,8 +318,8 @@ class AccountOverview extends PureComponent {
       account: { address, name },
       onboardingWizard,
     } = this.props;
-    const colors = this.context.colors || mockTheme.colors;
-    const themeAppearance = this.context.themeAppearance || 'light';
+    const colors = this.context?.colors || mockTheme.colors;
+    const themeAppearance = this.context?.themeAppearance || 'light';
     const styles = createStyles(colors);
 
     if (!address) return null;
@@ -449,7 +428,7 @@ class AccountOverview extends PureComponent {
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
   selectedAddress: selectSelectedInternalAccountFormattedAddress(state),
   internalAccounts: selectInternalAccounts(state),
   currentCurrency: selectCurrentCurrency(state),
@@ -457,10 +436,10 @@ const mapStateToProps = (state) => ({
   browserTabs: state.browser.tabs,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  showAlert: (config) => dispatch(showAlert(config)),
+const mapDispatchToProps = (dispatch: any) => ({
+  showAlert: (config: any) => dispatch(showAlert(config)),
   protectWalletModalVisible: () => dispatch(protectWalletModalVisible()),
-  newAssetTransaction: (selectedAsset) =>
+  newAssetTransaction: (selectedAsset: any) =>
     dispatch(newAssetTransaction(selectedAsset)),
 });
 
